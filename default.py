@@ -298,7 +298,7 @@ def show_ondemand_root():
     raiplay = RaiPlay()
     items = raiplay.getMainMenu()
     for item in items:
-        if item["sub-type"] in ("RaiPlay Tipologia Page", "RaiPlay Genere Page"):
+        if item["sub-type"] in ("RaiPlay Tipologia Page", "RaiPlay Genere Page", "RaiPlay Tipologia Editoriale Page" ):
             liStyle = xbmcgui.ListItem(item["name"])
             addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
     liStyle = xbmcgui.ListItem("Cerca")
@@ -489,7 +489,7 @@ elif mode == "nop":
 elif mode == "ondemand":
     if subType == "":
         show_ondemand_root()
-    elif subType in ("RaiPlay Tipologia Page", "RaiPlay Genere Page"):
+    elif subType in ("RaiPlay Tipologia Page", "RaiPlay Genere Page", "RaiPlay Tipologia Editoriale Page"):
         show_ondemand_programmes(pathId)
     elif subType == "Raiplay Tipologia Item":
             show_ondemand_list(pathId)
