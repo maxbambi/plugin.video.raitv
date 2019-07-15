@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 import os
 import sys
 import xbmc
@@ -6,9 +6,16 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 import urllib
-import urlparse
+try:
+  import urllib.parse as urlparse
+except ImportError:
+    import urlparse
+try:
+    from urllib.parse import urlencode
+except:
+    from urllib import urlencode
 import datetime
-import StorageServer
+from resources.lib import StorageServer
 from resources.lib.tgr import TGR
 from resources.lib.search import Search
 from resources.lib.raiplay import RaiPlay
@@ -37,13 +44,13 @@ def parameters_string_to_dict(parameters):
     return paramDict
  
 def addDirectoryItem(parameters, li):
-    url = sys.argv[0] + '?' + urllib.urlencode(parameters)
+    url = sys.argv[0] + '?' + urlencode(parameters)
     return xbmcplugin.addDirectoryItem(handle=handle, url=url, 
         listitem=li, isFolder=True)
 
 def addLinkItem(parameters, li, url=""):
     if url == "":
-        url = sys.argv[0] + '?' + urllib.urlencode(parameters)
+        url = sys.argv[0] + '?' + urlencode(parameters)
     li.setProperty('IsPlayable', 'true')
     return xbmcplugin.addDirectoryItem(handle=handle, url=url, 
         listitem=li, isFolder=False)
@@ -71,10 +78,16 @@ def show_root_menu():
 
 def show_tg_root():
     search = Search()
-    for k, v in search.newsArchives.iteritems():
-        liStyle = xbmcgui.ListItem(k)
-        addDirectoryItem({"mode": "get_last_content_by_tag",
-            "tags": search.newsArchives[k]}, liStyle)    
+    try:
+        for k, v in search.newsArchives.iteritems():
+            liStyle = xbmcgui.ListItem(k)
+            addDirectoryItem({"mode": "get_last_content_by_tag",
+                "tags": search.newsArchives[k]}, liStyle)
+    except:
+        for k, v in search.newsArchives.items():
+            liStyle = xbmcgui.ListItem(k)
+            addDirectoryItem({"mode": "get_last_content_by_tag",
+                "tags": search.newsArchives[k]}, liStyle)
     liStyle = xbmcgui.ListItem("TGR",
         thumbnailImage="http://www.tgr.rai.it/dl/tgr/mhp/immagini/splash.png")
     addDirectoryItem({"mode": "tgr"}, liStyle)  
@@ -148,7 +161,8 @@ def play(url, pathId="", srt=[]):
     xbmc.log("Media URL: " + url)
     
     # Play the item
-    item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
+    try: item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
+    except: item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
     if len(srt) > 0:
         item.setSubtitles(srt)
     xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
@@ -382,10 +396,16 @@ def search_ondemand_programmes():
     
 def show_news_providers():
     search = Search()
-    for k, v in search.newsProviders.iteritems():
-        liStyle = xbmcgui.ListItem(k)
-        addDirectoryItem({"mode": "get_last_content_by_tag",
-            "tags": search.newsProviders[k]}, liStyle)
+    try:
+        for k, v in search.newsProviders.iteritems():
+            liStyle = xbmcgui.ListItem(k)
+            addDirectoryItem({"mode": "get_last_content_by_tag",
+                "tags": search.newsProviders[k]}, liStyle)
+    except:
+        for k, v in search.newsProviders.items():
+            liStyle = xbmcgui.ListItem(k)
+            addDirectoryItem({"mode": "get_last_content_by_tag",
+                "tags": search.newsProviders[k]}, liStyle)
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     

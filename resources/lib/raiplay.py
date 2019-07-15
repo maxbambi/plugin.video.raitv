@@ -1,5 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-import urllib2
+# -*- coding: utf-8 -*-
+try:
+  import urllib.request as urllib2
+except ImportError:
+    import urllib2
 import json
 
 class RaiPlay:
