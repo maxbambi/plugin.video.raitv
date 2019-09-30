@@ -1,7 +1,3 @@
-[B]2.1.0[/B]
-- New epg source: 
-https://www.raiplay.it/palinsesto/guidatv/lista/
-
 [B]2.0.0[/B]
 - Updated live tv, replay, on demand sections to new Raiplay API.
 - Updated live radio to new API.
