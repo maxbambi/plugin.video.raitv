@@ -1,5 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-import urllib2
+# -*- coding: utf-8 -*-
+try:
+  import urllib.request as urllib2
+except ImportError:
+    import urllib2
 import json
 
 class RaiPlay:
@@ -14,7 +17,8 @@ class RaiPlay:
     channelsUrl = "http://www.rai.it/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json"
     localizeUrl = "http://mediapolisgs.rai.it/relinker/relinkerServlet.htm?cont=201342"
     menuUrl = "http://www.rai.it/dl/RaiPlay/2016/menu/PublishingBlock-20b274b1-23ae-414f-b3bf-4bdc13b86af2.html?homejson"
-    palinsestoUrl = "https://www.raiplay.it/dl/palinsesti/Page-e120a813-1b92-4057-a214-15943d95aa68-json.html?canale=[nomeCanale]&giorno=[dd-mm-yyyy]"
+    #palinsestoUrl = "https://www.raiplay.it/dl/palinsesti/Page-e120a813-1b92-4057-a214-15943d95aa68-json.html?canale=[nomeCanale]&giorno=[dd-mm-yyyy]"
+    palinsestoUrl = "https://www.raiplay.it/palinsesto/guidatv/lista/[idCanale]/[dd-mm-yyyy].html"
     AzTvShowPath = "/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json"
     
     def __init__(self):
@@ -35,12 +39,11 @@ class RaiPlay:
         return response["dirette"]
         
     def getProgrammes(self, channelName, epgDate):
-        channelTag = channelName.replace(" ", "")
+        channelTag = channelName.replace(" ", "-").lower()
         url = self.palinsestoUrl
-        url = url.replace("[nomeCanale]", channelTag)
+        url = url.replace("[idCanale]", channelTag)
         url = url.replace("[dd-mm-yyyy]", epgDate)
-        response = json.load(urllib2.urlopen(url))
-        return response[channelName][0]["palinsesto"][0]["programmi"]
+        return urllib2.urlopen(url).read()
         
     def getMainMenu(self):
         response = json.load(urllib2.urlopen(self.menuUrl))
