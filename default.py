@@ -404,7 +404,8 @@ def search_ondemand_programmes():
     kb.setHeading("Cerca un programma")
     kb.doModal()
     if kb.isConfirmed():
-        name = kb.getText().decode('utf8')
+        try: name = kb.getText().decode('utf8').lower()
+        except: name = kb.getText().lower()
         xbmc.log("Searching for programme: " + name)
         raiplay = RaiPlay()
         dir = raiplay.getProgrammeList(raiplay.AzTvShowPath)
