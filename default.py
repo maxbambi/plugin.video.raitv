@@ -169,12 +169,24 @@ def play(url, pathId="", srt=[]):
     xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
 
 def show_tv_channels():
+    xbmc.log("Raiplay: get Rai channels: ")
+
     raiplay = RaiPlay()
     for station in tv_stations:
         liStyle = xbmcgui.ListItem(station["channel"], thumbnailImage=raiplay.getThumbnailUrl(station["transparent-icon"]))
         liStyle.setInfo("video", {})
         addLinkItem({"mode": "play",
             "url": station["video"]["contentUrl"]}, liStyle)
+    #rai sport web streams
+    xbmc.log("Raiplay: get Rai sport web channels: ")
+
+    chList = raiplay.getRaiSportPage()
+    xbmc.log(str(chList))
+    for ch in chList:
+        liStyle = xbmcgui.ListItem(ch['title'], thumbnailImage = ch['icon'])
+        liStyle.setInfo("video", {})
+        addLinkItem({"mode": "play", "url": ch["url"]}, liStyle)
+    
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_radio_stations():
@@ -208,6 +220,8 @@ def show_replay_tv_channels(date):
             "media": "tv",
             "channel_id": station["channel"],
             "date": date}, liStyle)
+    # add rai sport web streams
+    
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
 def show_replay_radio_channels(date):

@@ -1,3 +1,14 @@
+[B]3.1.1[/B]
+- add Rai sport web streams 
+
+[B]3.1.0[/B]
+- New epg source: 
+https://www.raiplay.it/palinsesto/guidatv/lista/
+
+[B]3.0.0[/B]
+- from https://github.com/cttynul/plugin.video.raitv 
+Storage Server used is a fork of Common Plugin Cache, edited to make it works with Python 3
+
 [B]2.0.0[/B]
 - Updated live tv, replay, on demand sections to new Raiplay API.
 - Updated live radio to new API.

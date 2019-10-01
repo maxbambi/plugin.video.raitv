@@ -4,6 +4,7 @@ try:
 except ImportError:
     import urllib2
 import json
+import re
 
 class RaiPlay:
     # Raiplay android app
@@ -20,6 +21,7 @@ class RaiPlay:
     #palinsestoUrl = "https://www.raiplay.it/dl/palinsesti/Page-e120a813-1b92-4057-a214-15943d95aa68-json.html?canale=[nomeCanale]&giorno=[dd-mm-yyyy]"
     palinsestoUrl = "https://www.raiplay.it/palinsesto/guidatv/lista/[idCanale]/[dd-mm-yyyy].html"
     AzTvShowPath = "/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json"
+    RaiSportWebUrl= "https://www.raisport.rai.it/dirette.html"
     
     def __init__(self):
         opener = urllib2.build_opener()
@@ -37,6 +39,30 @@ class RaiPlay:
     def getChannels(self):
         response = json.load(urllib2.urlopen(self.channelsUrl))
         return response["dirette"]
+    
+    def getRaiSportPage(self):
+        chList = []
+        response = urllib2.urlopen(self.RaiSportWebUrl).read()
+        m = re.search('<ul class="canali">(?P<list>.*)</ul>', response, re.S)
+        if m:
+            channels = re.findall ('<li>(.*?)</li>', m.group('list'), re.S)
+            for ch in channels:
+                url = re.search('''data-video-url=['"](?P<url>[^'^"]+)['"]''', ch)
+                if url:
+                    url = url.group('url')
+                    icon = re.search('''stillframe=['"](?P<url>[^'^"]+)['"]''', ch )
+                    if icon:
+                        icon = self.getUrl(icon.group('url'))
+                    else:
+                        icon = ''
+                    title = re.search(">(?P<title>[^<]+)</a>", ch )
+                    if title:
+                        title = title.group('title')
+                    else:
+                        title = 'Rai Sport Web Link'
+                    chList.append({'title':title, 'url':url, 'icon':icon})
+        
+        return chList
         
     def getProgrammes(self, channelName, epgDate):
         channelTag = channelName.replace(" ", "-").lower()
