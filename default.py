@@ -15,7 +15,12 @@ try:
 except:
     from urllib import urlencode
 import datetime
-from resources.lib import StorageServer
+
+try:
+   import StorageServer
+except:
+   import storageserverdummy as StorageServer
+
 from resources.lib.tgr import TGR
 from resources.lib.search import Search
 from resources.lib.raiplay import RaiPlay

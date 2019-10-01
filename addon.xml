@@ -5,7 +5,7 @@
        provider-name="Nightflyer, cttynul, maxbambi">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.common.plugin.cache" version="0.9.1"/>
+    <import addon="script.common.plugin.cache" version="2.5.0"/>
   </requires>
   <extension point="xbmc.python.pluginsource"
             library="default.py">
