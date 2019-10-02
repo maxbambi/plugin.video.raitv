@@ -76,21 +76,17 @@ def show_root_menu():
     addDirectoryItem({"mode": "ondemand"}, liStyle)
     liStyle = xbmcgui.ListItem("Archivio Telegiornali")
     addDirectoryItem({"mode": "tg"}, liStyle)
-    liStyle = xbmcgui.ListItem("Videonotizie")
-    addDirectoryItem({"mode": "news"}, liStyle)
-    liStyle = xbmcgui.ListItem("Aree tematiche")
-    addDirectoryItem({"mode": "themes"}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_tg_root():
     search = Search()
     try:
-        for k, v in search.newsArchives.iteritems():
+        for k, v in search.newsArchives.items():
             liStyle = xbmcgui.ListItem(k)
             addDirectoryItem({"mode": "get_last_content_by_tag",
                 "tags": search.newsArchives[k]}, liStyle)
     except:
-        for k, v in search.newsArchives.items():
+        for k, v in list(search.newsArchives.items()):
             liStyle = xbmcgui.ListItem(k)
             addDirectoryItem({"mode": "get_last_content_by_tag",
                 "tags": search.newsArchives[k]}, liStyle)
@@ -422,30 +418,6 @@ def search_ondemand_programmes():
         xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
-def show_news_providers():
-    search = Search()
-    try:
-        for k, v in search.newsProviders.iteritems():
-            liStyle = xbmcgui.ListItem(k)
-            addDirectoryItem({"mode": "get_last_content_by_tag",
-                "tags": search.newsProviders[k]}, liStyle)
-    except:
-        for k, v in search.newsProviders.items():
-            liStyle = xbmcgui.ListItem(k)
-            addDirectoryItem({"mode": "get_last_content_by_tag",
-                "tags": search.newsProviders[k]}, liStyle)
-    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
-    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
-    
-def show_themes():
-    search = Search()
-    for position, tematica in enumerate(search.tematiche):
-        liStyle = xbmcgui.ListItem(tematica)
-        addDirectoryItem({"mode": "get_last_content_by_tag",
-            "tags": "Tematica:"+search.tematiche[int(position)]}, liStyle)
-    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
-    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
-    
 def get_last_content_by_tag(tags):
     xbmc.log("Get latest content for tags: " + tags)
     search = Search()
@@ -539,12 +511,6 @@ elif mode == "tgr":
         show_tgr_list(mode, url)        
     else:
         show_tgr_root()        
-
-elif mode == "news":
-    show_news_providers()
-elif mode == "themes":
-    show_themes()
-
 elif mode == "get_last_content_by_tag":
      get_last_content_by_tag(tags)
 elif mode == "get_most_visited":
