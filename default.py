@@ -488,8 +488,9 @@ def get_raisport_videos(params):
     for r in response:
         #xbmc.log("Item %s" % r['title'])
         if r['mode'] == "raisport_video":
-            liStyle = xbmcgui.ListItem(r['title'], thumbnailImage=r['icon'])
-            liStyle.setInfo("video", {})
+            liStyle = xbmcgui.ListItem(r['title'])
+            liStyle.setArt({'thumb': r['icon']})
+            liStyle.setInfo("video", {'duration' : r['duration'], 'aired': r['aired'], 'plot' : r['desc']})
             addLinkItem({"mode": "play", "url": r["url"]}, liStyle)
         elif r['mode'] == "raisport_subitem":
             liStyle = xbmcgui.ListItem(r['title'])

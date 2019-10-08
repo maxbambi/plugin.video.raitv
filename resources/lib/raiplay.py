@@ -6,6 +6,7 @@ except ImportError:
 import json
 import re
 import HTMLParser
+import xbmc
 
 class RaiPlay:
     # Raiplay android app
@@ -129,7 +130,12 @@ class RaiPlay:
         }
         postData=json.dumps(payload)
         req = urllib2.Request(self.RaiSportSearchUrl, postData, header)
-        data = urllib2.urlopen(req).read()
+        
+        response = urllib2.urlopen(req)
+        if response.code != 200:
+            return []
+        
+        data = response.read()
         j = json.loads(data)
         
         if 'hits' in j:
@@ -142,24 +148,26 @@ class RaiPlay:
                             relinker_url = hh['_source']['media']['mediapolis']
 
                             if 'durata' in hh['_source']['media']:
-                                duration = " - " + "Duration" + ": " + hh['_source']['media']['durata']
+                                d= hh['_source']['media']['durata'].split(":")
+                                duration = int(d[0])*3600 + int(d[1])*60 + int(d[2])
                             else:
-                                duration = ""
+                                duration = 0
 
                             icon = self.RaiSportMainUrl + hh['_source']['immagini']['default']
                             title = hh['_source']['titolo']
                             creation_date = hh['_source']['data_creazione']
                             if 'sommario' in hh['_source']: 
-                                desc = creation_date + duration + '\n' + hh['_source']['sommario']
+                                desc = creation_date + '\n' + hh['_source']['sommario']
                             else:
-                                desc = creation_date + duration
+                                desc = creation_date 
 
-                            params= {'mode':'raisport_video', 'title': title, 'desc': desc, 'url': relinker_url, 'icon': icon}
+                            params= {'mode':'raisport_video', 'title': title, 'url': relinker_url, 'icon': icon, 
+                                     'duration' : duration, 'aired': creation_date, 'desc': desc}
                             videos.append(params)
 
             if h['total'] > (page + pageSize):
                 page += pageSize
-                params = {'mode':'raisport_subitem', 'title': "Next page", 'page': page}
+                params = {'mode':'raisport_subitem', 'title': xbmc.getLocalizedString(33078), 'page': page}
                 videos.append(params)
         
         return videos
