@@ -5,6 +5,7 @@ except ImportError:
     import urllib2
 import json
 import re
+import HTMLParser
 
 class RaiPlay:
     # Raiplay android app
@@ -21,7 +22,13 @@ class RaiPlay:
     #palinsestoUrl = "https://www.raiplay.it/dl/palinsesti/Page-e120a813-1b92-4057-a214-15943d95aa68-json.html?canale=[nomeCanale]&giorno=[dd-mm-yyyy]"
     palinsestoUrl = "https://www.raiplay.it/palinsesto/guidatv/lista/[idCanale]/[dd-mm-yyyy].html"
     AzTvShowPath = "/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json"
-    RaiSportWebUrl= "https://www.raisport.rai.it/dirette.html"
+    
+    # Rai Sport urls
+    RaiSportMainUrl = 'https://www.raisport.rai.it'
+    RaiSportLiveUrl= RaiSportMainUrl + '/dirette.html'
+    RaiSportArchivioUrl = RaiSportMainUrl + '/archivio.html'        
+    RaiSportSearchUrl = RaiSportMainUrl +  "/atomatic/news-search-service/api/v1/search?transform=false"
+
     
     def __init__(self):
         opener = urllib2.build_opener()
@@ -40,9 +47,9 @@ class RaiPlay:
         response = json.load(urllib2.urlopen(self.channelsUrl))
         return response["dirette"]
     
-    def getRaiSportPage(self):
+    def getRaiSportLivePage(self):
         chList = []
-        response = urllib2.urlopen(self.RaiSportWebUrl).read()
+        response = urllib2.urlopen(self.RaiSportLiveUrl).read()
         m = re.search('<ul class="canali">(?P<list>.*)</ul>', response, re.S)
         if m:
             channels = re.findall ('<li>(.*?)</li>', m.group('list'), re.S)
@@ -63,7 +70,100 @@ class RaiPlay:
                     chList.append({'title':title, 'url':url, 'icon':icon})
         
         return chList
+    
+    def fillRaiSportKeys(self):
+        # search for items in main menu
+        RaiSportKeys=[]
         
+        data = urllib2.urlopen(self.RaiSportMainUrl).read()
+        m = re.search("<a href=\"javascript:void\(0\)\">Menu</a>(.*?)</div>", data,re.S)
+        if not m: 
+            return []
+        menu = m.group(0)
+        
+        links = re.findall("<a href=\"(?P<url>[^\"]+)\">(?P<title>[^<]+)</a>", menu)
+        good_links=[]
+        for l in links:
+            if ('/archivio.html?' in l[0]) and not ('&amp;' in l[0]):
+                good_links.append({'title': l[1], 'url' : l[0]})
+        
+        good_links.append({'title': 'Altri sport', 'url' : '/archivio.html?tematica=altri-sport'})
+        
+        # open any single page in list and grab search keys
+        
+        for l in good_links:
+            data = urllib2.urlopen(self.RaiSportMainUrl + l['url']).read()
+
+            dataDominio= re.findall("data-dominio=\"(.*?)\"", data)
+            dataTematica = re.findall("data-tematica=\"(.*?)\"", data)
+            if dataTematica:
+                del(dataTematica[0])
+                title=dataTematica[0].split('|')[0]
+                title = HTMLParser.HTMLParser().unescape(title).encode('utf-8')
+                params={'title': title, 'dominio': dataDominio[0], 'sub_keys' : dataTematica}
+                
+                RaiSportKeys.append(params)
+        
+        return RaiSportKeys
+    
+    def getRaiSportVideos(self, key, domain, page):
+        videos = []
+        header = {
+                  'Accept': 'application/json, text/javascript, */*; q=0.01' ,
+                  'Content-Type': 'application/json; charset=UTF-8',
+                  'Origin': 'https://www.raisport.rai.it',
+                  'Referer': 'https://www.raisport.rai.it/archivio.html',
+                  'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36',
+                  'X-Requested-With': 'XMLHttpRequest',
+                 }
+        page = int(page)
+        pageSize = 50
+
+        payload = {
+            "page": page,
+            "pageSize": pageSize,
+            "filters":{
+                "tematica":[key],
+                "dominio": domain
+            }
+        }
+        postData=json.dumps(payload)
+        req = urllib2.Request(self.RaiSportSearchUrl, postData, header)
+        data = urllib2.urlopen(req).read()
+        j = json.loads(data)
+        
+        if 'hits' in j:
+            h = j['hits']
+            if 'hits' in h:
+                for hh in h['hits']:
+                    if '_source' in hh:
+                        news_type = hh['_source']['tipo']
+                        if news_type == 'Video' and 'media' in hh['_source']:
+                            relinker_url = hh['_source']['media']['mediapolis']
+
+                            if 'durata' in hh['_source']['media']:
+                                duration = " - " + "Duration" + ": " + hh['_source']['media']['durata']
+                            else:
+                                duration = ""
+
+                            icon = self.RaiSportMainUrl + hh['_source']['immagini']['default']
+                            title = hh['_source']['titolo']
+                            creation_date = hh['_source']['data_creazione']
+                            if 'sommario' in hh['_source']: 
+                                desc = creation_date + duration + '\n' + hh['_source']['sommario']
+                            else:
+                                desc = creation_date + duration
+
+                            params= {'mode':'raisport_video', 'title': title, 'desc': desc, 'url': relinker_url, 'icon': icon}
+                            videos.append(params)
+
+            if h['total'] > (page + pageSize):
+                page += pageSize
+                params = {'mode':'raisport_subitem', 'title': "Next page", 'page': page}
+                videos.append(params)
+        
+        return videos
+    
     def getProgrammes(self, channelName, epgDate):
         channelTag = channelName.replace(" ", "-").lower()
         url = self.palinsestoUrl

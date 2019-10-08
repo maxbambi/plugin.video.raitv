@@ -28,6 +28,7 @@ from resources.lib.raiplayradio import RaiPlayRadio
 from resources.lib.relinker import Relinker
 import resources.lib.utils as utils
 import re
+import HTMLParser
 
 # plugin constants
 __plugin__ = "plugin.video.raitv"
@@ -42,6 +43,7 @@ handle = int(sys.argv[1])
 cache = StorageServer.StorageServer("plugin.video.raitv", 1) # (Your plugin name, Cache time in hours)
 tv_stations = cache.cacheFunction(RaiPlay().getChannels)
 radio_stations = cache.cacheFunction(RaiPlayRadio().getChannels)
+raisport_keys = cache.cacheFunction(RaiPlay().fillRaiSportKeys)
 
 # utility functions
 def parameters_string_to_dict(parameters):
@@ -76,6 +78,9 @@ def show_root_menu():
     addDirectoryItem({"mode": "ondemand"}, liStyle)
     liStyle = xbmcgui.ListItem("Archivio Telegiornali")
     addDirectoryItem({"mode": "tg"}, liStyle)
+    liStyle = xbmcgui.ListItem("Archivio Rai Sport")
+    addDirectoryItem({"mode": "raisport_main"}, liStyle)
+    
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_tg_root():
@@ -181,7 +186,7 @@ def show_tv_channels():
     #rai sport web streams
     xbmc.log("Raiplay: get Rai sport web channels: ")
 
-    chList = raiplay.getRaiSportPage()
+    chList = raiplay.getRaiSportLivePage()
     xbmc.log(str(chList))
     for ch in chList:
         liStyle = xbmcgui.ListItem(ch['title'], thumbnailImage = ch['icon'])
@@ -221,7 +226,6 @@ def show_replay_tv_channels(date):
             "media": "tv",
             "channel_id": station["channel"],
             "date": date}, liStyle)
-    # add rai sport web streams
     
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
@@ -442,6 +446,57 @@ def show_search_result(items):
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_NONE)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
+def get_raisport_main():
+    xbmc.log("Build Rai Sport menu with search keys....")
+    raiplay = RaiPlay()
+    
+    for k in raisport_keys:
+        liStyle = xbmcgui.ListItem(k['title'])
+        addDirectoryItem({"mode": "raisport_item", 'dominio': k['dominio'], 'sub_keys': k['sub_keys']}, liStyle)
+
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_NONE)
+    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
+
+def get_raisport_items(params):
+    dominio = params.get('dominio','')
+    sub_keys = eval(params.get("sub_keys","[]"))
+    xbmc.log("Build Rai Sport menu of item %s " % sub_keys[0])
+
+    for i in range(0, len(sub_keys)):
+        key = sub_keys[i]
+        title = key.split("|")[0]
+        title = HTMLParser.HTMLParser().unescape(title).encode('utf-8')
+        if i==0:
+            title = "Tutto su " + title
+        
+        liStyle = xbmcgui.ListItem(title)
+        addDirectoryItem({"mode": "raisport_subitem", 'dominio': dominio, 'key': key}, liStyle)
+
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_NONE)
+    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
+            
+def get_raisport_videos(params):
+    xbmc.log("Build Rai Sport video list for %s " % params)
+    raiplay = RaiPlay()
+
+    key = params.get('key','')
+    dominio = params.get('dominio','')
+    page = params.get('page',0)
+    
+    
+    response = raiplay.getRaiSportVideos(key, dominio, page)
+    for r in response:
+        #xbmc.log("Item %s" % r['title'])
+        if r['mode'] == "raisport_video":
+            liStyle = xbmcgui.ListItem(r['title'], thumbnailImage=r['icon'])
+            liStyle.setInfo("video", {})
+            addLinkItem({"mode": "play", "url": r["url"]}, liStyle)
+        elif r['mode'] == "raisport_subitem":
+            liStyle = xbmcgui.ListItem(r['title'])
+            addDirectoryItem({"mode": "raisport_subitem", 'dominio': dominio, 'key': key, 'page': r['page']}, liStyle)
+
+    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
+
 def log_country():
     raiplay = RaiPlay()
     country = raiplay.getCountry()
@@ -516,9 +571,15 @@ elif mode == "get_last_content_by_tag":
 elif mode == "get_most_visited":
      get_most_visited(tags)
 
-elif mode == "play":
+elif mode == "play" or mode =="raiplay_videos":
     play(url, pathId)
 
+elif mode == "raisport_main":
+    get_raisport_main()
+elif mode == "raisport_item":
+    get_raisport_items(params)
+elif mode == "raisport_subitem":
+    get_raisport_videos(params)
 else:
     log_country()
     show_root_menu()
