@@ -209,7 +209,12 @@ class RaiPlay:
     
     def getVideoMetadata(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
+        data = urllib2.urlopen(url).read()
+        
+        s_name = re.findall("\"name\": \"(.*?)\",", data)
+        for s in s_name:
+            data = data.replace(s , s.replace("\""," "))
+        response = json.loads(data)
         return response["video"]
     
     def getUrl(self, pathId):
