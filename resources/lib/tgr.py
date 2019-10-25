@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 try:
   import urllib.request as urllib2
 except ImportError:

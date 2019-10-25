@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import urllib
 try:
   import urllib.request as urllib2
