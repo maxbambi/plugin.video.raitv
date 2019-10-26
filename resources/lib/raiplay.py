@@ -5,7 +5,10 @@ except ImportError:
     import urllib2
 import json
 import re
-import HTMLParser
+try:
+	import HTMLParser
+except ImportError:
+	import html.parser as HTMLParser
 import xbmc
 
 class RaiPlay:

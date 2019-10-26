@@ -16,10 +16,7 @@ except:
     from urllib import urlencode
 import datetime
 
-try:
-   import StorageServer
-except:
-   import storageserverdummy as StorageServer
+from resources.lib import StorageServer
 
 from resources.lib.tgr import TGR
 from resources.lib.search import Search
@@ -28,7 +25,10 @@ from resources.lib.raiplayradio import RaiPlayRadio
 from resources.lib.relinker import Relinker
 import resources.lib.utils as utils
 import re
-import HTMLParser
+try:
+	import HTMLParser
+except:
+	import html.parser as HTMLParser
 
 # plugin constants
 __plugin__ = "plugin.video.raitv"
