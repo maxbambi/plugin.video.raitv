@@ -476,13 +476,19 @@ def search_ondemand_programmes():
         except: name = kb.getText().lower()
         xbmc.log("Searching for programme: " + name)
         raiplay = RaiPlay()
-        dir = raiplay.getProgrammeList(raiplay.AzTvShowPath)
+        # old style of json
+        dir = raiplay.getProgrammeListOld(raiplay.AzTvShowPath)
         for letter in dir:
             for item in dir[letter]:
                 if item["name"].lower().find(name) != -1:
+                    #fix old version of url
+                    url = item["PathID"]
+                    if url.endswith('/?json'):
+                        url = url.replace('/?json', '.json')
+                    
                     liStyle = xbmcgui.ListItem(item["name"])
                     liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
-                    addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": "PLR programma Page"}, liStyle)
+                    addDirectoryItem({"mode": "ondemand", "path_id": url , "sub_type": "PLR programma Page"}, liStyle)
         xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     

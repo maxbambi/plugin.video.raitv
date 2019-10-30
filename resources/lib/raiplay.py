@@ -210,7 +210,13 @@ class RaiPlay:
         url = self.getUrl(pathId)
         response = json.load(urllib2.urlopen(url))
         return response["contents"]
-    
+
+    # Raiplay AZ List
+    def getProgrammeListOld(self, pathId):
+        url = self.getUrl(pathId)
+        response = json.load(urllib2.urlopen(url))
+        return response
+      
     #  PLR programma Page
     def getProgramme(self, pathId):
         url = self.getUrl(pathId)
