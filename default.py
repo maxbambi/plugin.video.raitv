@@ -7,7 +7,7 @@ import xbmcplugin
 import xbmcaddon
 import urllib
 try:
-  import urllib.parse as urlparse
+    import urllib.parse as urlparse
 except ImportError:
     import urlparse
 try:
@@ -141,6 +141,7 @@ def play(url, pathId="", srt=[]):
     
     if pathId != "":
         xbmc.log("PathID: " + pathId)
+
         # Ugly hack
         if pathId[:7] == "/audio/":
             raiplayradio = RaiPlayRadio()
@@ -149,8 +150,9 @@ def play(url, pathId="", srt=[]):
             srtUrl = ""
         else:
             raiplay = RaiPlay()
+            xbmc.log("Url: " + raiplay.getUrl(pathId))
             metadata = raiplay.getVideoMetadata(pathId)
-            url = metadata["contentUrl"]
+            url = metadata["content_url"]
             srtUrl = metadata["subtitles"]
             
         if srtUrl != "":
@@ -318,8 +320,6 @@ def show_replay_tv_epg(date, channelId):
                 addLinkItem({"mode": "nop"}, liStyle)
             else:
                 videoUrl = videoUrl[0]
-                if not videoUrl.endswith('json'):
-                    videoUrl = videoUrl + "?json"
 
                 liStyle = xbmcgui.ListItem(title )
                 liStyle.setArt({"thumb": icon})
@@ -379,6 +379,8 @@ def show_ondemand_root():
 def show_ondemand_programmes(pathId):
     xbmc.log("PathID: " + pathId)
     raiplay = RaiPlay()
+    xbmc.log("Url: " + raiplay.getUrl(pathId))
+   
     blocchi = raiplay.getCategory(pathId)
 
     if len(blocchi) > 1:
