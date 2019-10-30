@@ -370,8 +370,15 @@ def show_ondemand_root():
     items = raiplay.getMainMenu()
     for item in items:
         if item["sub-type"] in ("RaiPlay Tipologia Page", "RaiPlay Genere Page", "RaiPlay Tipologia Editoriale Page" ):
-            liStyle = xbmcgui.ListItem(item["name"])
-            addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
+ 
+            if not (item["name"] in ("Teatro", "Musica")):
+                liStyle = xbmcgui.ListItem(item["name"])
+                addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
+    
+    # add new item not in old json
+    liStyle = xbmcgui.ListItem("Performing Arts")
+    addDirectoryItem({"mode": "ondemand", "path_id": "https://www.raiplay.it/performing-arts/index.json", "sub_type": "RaiPlay Tipologia Page"}, liStyle)
+
     liStyle = xbmcgui.ListItem("Cerca")
     addDirectoryItem({"mode": "ondemand_search_by_name"}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
