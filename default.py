@@ -398,11 +398,17 @@ def show_ondemand_programmes(pathId):
 
 def show_ondemand_list(pathId):
     xbmc.log("Raiplay.show_ondemand_list with PathID: %s" % pathId )
-    liStyle = xbmcgui.ListItem("0-9")
-    addDirectoryItem({"mode": "ondemand_list", "index": "0-9", "path_id": pathId}, liStyle)
-    for i in range(26):
-        liStyle = xbmcgui.ListItem(chr(ord('A')+i))
-        addDirectoryItem({"mode": "ondemand_list", "index": chr(ord('A')+i), "path_id": pathId}, liStyle)
+    # indice ottenuto dal json
+    raiplay = RaiPlay()
+    xbmc.log("Url: %s" % raiplay.getUrl(pathId) )
+    
+    index = raiplay.getIndexFromJSON(pathId)
+    xbmc.log(str(index))
+
+    for i in index:
+        liStyle = xbmcgui.ListItem(i)
+        addDirectoryItem({"mode": "ondemand_list", "index": i, "path_id": pathId}, liStyle)
+    
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_ondemand_index(index, pathId):
@@ -476,7 +482,7 @@ def search_ondemand_programmes():
                 if item["name"].lower().find(name) != -1:
                     liStyle = xbmcgui.ListItem(item["name"])
                     liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
-                    addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": "PLR programma Page"}, liStyle)
+                    addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": "PLR programma Page"}, liStyle)
         xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     

@@ -40,10 +40,6 @@ class RaiPlay:
         opener.addheaders = [('User-Agent', self.UserAgent)]
         urllib2.install_opener(opener)
         
-        self.menuIndex = ['0-9']
-        for i in range(26):
-            self.menuIndex.append(chr(ord('A')+i))
-        
     def getCountry(self):
         try:
             response = urllib2.urlopen(self.localizeUrl).read()
@@ -241,6 +237,18 @@ class RaiPlay:
         response = json.load(urllib2.urlopen(url))
         
         return response["video"]
+    
+    def getIndexFromJSON(self, pathId):
+        url = self.getUrl(pathId)
+        response = json.load(urllib2.urlopen(url))
+        
+        index = []
+        for i in response["contents"]:
+          if len(response["contents"][i])>0:
+            index.append(i)
+        
+        index.sort()
+        return index
     
     def getUrl(self, pathId):
         url = pathId.replace(" ", "%20")
