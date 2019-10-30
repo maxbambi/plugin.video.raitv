@@ -39,7 +39,11 @@ class RaiPlay:
         # Set User-Agent
         opener.addheaders = [('User-Agent', self.UserAgent)]
         urllib2.install_opener(opener)
-    
+        
+        self.menuIndex = ['0-9']
+        for i in range(26):
+            self.menuIndex.append(chr(ord('A')+i))
+        
     def getCountry(self):
         try:
             response = urllib2.urlopen(self.localizeUrl).read()
@@ -182,9 +186,9 @@ class RaiPlay:
         url = url.replace("[dd-mm-yyyy]", epgDate)
         response = json.load(urllib2.urlopen(url))
         try:
-          oRetVal = response[channelName][0]["palinsesto"][0]["programmi"]
+            oRetVal = response[channelName][0]["palinsesto"][0]["programmi"]
         except:
-          oRetVal = None
+            oRetVal = None
         return oRetVal
     
     def getProgrammesHtml(self, channelName, epgDate):
@@ -203,13 +207,13 @@ class RaiPlay:
     def getCategory(self, pathId):
         url = self.getUrl(pathId)
         response = json.load(urllib2.urlopen(url))
-        return response["blocchi"]
+        return response["contents"]
   
     # Raiplay Tipologia Item
     def getProgrammeList(self, pathId):
         url = self.getUrl(pathId)
         response = json.load(urllib2.urlopen(url))
-        return response
+        return response["contents"]
     
     #  PLR programma Page
     def getProgramme(self, pathId):
