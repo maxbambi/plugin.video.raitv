@@ -268,7 +268,7 @@ def show_replay_tv_epg(date, channelId):
                 thumb = raiplay.noThumbUrl
 
             if programme["hasVideo"]:
-                videoUrl = programme["path_id"]
+                videoUrl = programme["pathID"]
             else:
                 videoUrl = None
 
