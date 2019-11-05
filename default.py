@@ -332,6 +332,7 @@ def show_replay_tv_epg(date, channelId):
 def show_replay_radio_epg(date, channelId):
     xbmc.log("Showing EPG for " + channelId + " on " + date)
     raiplayradio = RaiPlayRadio()
+
     programmes = raiplayradio.getProgrammes(channelId.decode("utf-8"), date)
     
     for programme in programmes:
@@ -349,7 +350,7 @@ def show_replay_radio_epg(date, channelId):
             thumb = raiplayradio.noThumbUrl
         
         if programme["hasAudio"]:
-            audioUrl = programme["path_id"]
+            audioUrl = programme["pathID"]
         else:
             audioUrl = None
         
@@ -357,14 +358,13 @@ def show_replay_radio_epg(date, channelId):
             # programme is not available
             liStyle = xbmcgui.ListItem(startTime + " [I]" + title + "[/I]")
             liStyle.setArt({"thumb": thumb})
-            liStyle.setInfo("audio", {})
+            liStyle.setInfo("music", {})
             addLinkItem({"mode": "nop"}, liStyle)
         else:
             liStyle = xbmcgui.ListItem(startTime + " " + title)
             liStyle.setArt({"thumb": thumb})
-            liStyle.setInfo("audio", {})
-            addLinkItem({"mode": "play",
-                "path_id": audioUrl}, liStyle)
+            liStyle.setInfo("music", {})
+            addLinkItem({"mode": "play", "path_id": audioUrl}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
 def show_ondemand_root():
