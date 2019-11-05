@@ -206,9 +206,12 @@ def show_radio_stations():
     for station in radio_stations:
         liStyle = xbmcgui.ListItem(station["channel"])
         liStyle.setArt({"thumb": station["stillFrame"]})
-        liStyle.setInfo("audio", {})
-        addLinkItem({"mode": "play",
-            "url": station["audio"]["castUrl"]}, liStyle)
+        liStyle.setInfo("music", {})
+        if 'contentUrl' in station['audio']:
+            addLinkItem({"mode": "play", "url": station["audio"]["contentUrl"]}, liStyle)
+        else:
+            addLinkItem({"mode": "play", "url": station["audio"]["castUrl"]}, liStyle)
+        
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_replay_dates(media):
