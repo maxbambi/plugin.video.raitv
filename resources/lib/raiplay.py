@@ -100,13 +100,19 @@ class RaiPlay:
 
             dataDominio= re.findall("data-dominio=\"(.*?)\"", data)
             dataTematica = re.findall("data-tematica=\"(.*?)\"", data)
+            xbmc.log(str(dataTematica))
             if dataTematica:
-                del(dataTematica[0])
-                title=dataTematica[0].split('|')[0]
-                title = HTMLParser.HTMLParser().unescape(title).encode('utf-8')
-                params={'title': title, 'dominio': dataDominio[0], 'sub_keys' : dataTematica}
+                if len(dataTematica) > 1:
+                    del(dataTematica[0])
+        
+                try:
+                    title=dataTematica[0].split('|')[0]
+                    title = HTMLParser.HTMLParser().unescape(title).encode('utf-8')
+                    params={'title': title, 'dominio': dataDominio[0], 'sub_keys' : dataTematica}
                 
-                RaiSportKeys.append(params)
+                    RaiSportKeys.append(params)
+                except:
+                    xbmc.log("error in key %s" % str(dataTematica))
         
         return RaiSportKeys
     
