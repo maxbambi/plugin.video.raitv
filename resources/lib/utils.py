@@ -14,7 +14,11 @@ def checkStr(txt):
     # convert variable to type str both in Python 2 and 3
     if type(txt) == type(bytes()):
         txt = txt.decode('utf-8')
-    elif type(txt) == type(unicode()):
-        txt = txt.encode('utf-8')
-    
+    else: 
+        try:
+            if type(txt) == type(unicode()):
+                txt = txt.encode('utf-8')
+        except:
+            pass
+        
     return txt

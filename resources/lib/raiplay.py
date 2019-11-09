@@ -150,9 +150,13 @@ class RaiPlay:
             }
         }
         postData=json.dumps(payload)
-        req = urllib2.Request(self.RaiSportSearchUrl, postData, header)
-        
-        response = urllib2.urlopen(req)
+        try:
+            req = urllib2.Request(self.RaiSportSearchUrl, postData, header)
+            response = urllib2.urlopen(req)
+        except TypeError:
+            req = urllib2.Request(self.RaiSportSearchUrl, postData.encode('utf-8'), header)
+            response = urllib2.urlopen(req)
+          
         if response.code != 200:
             return []
 
