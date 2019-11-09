@@ -5,6 +5,7 @@ except ImportError:
     import urllib2
 import json
 import unicodedata
+import resources.lib.utils as utils
 
 class RaiPlayRadio:
     # Raiplay android app
@@ -28,7 +29,7 @@ class RaiPlayRadio:
     
     def getCountry(self):
         try:
-            response = urllib2.urlopen(self.localizeUrl).read()
+            response = utils.checkStr(urllib2.urlopen(self.localizeUrl).read())
         except urllib2.HTTPError:
             response = "ERROR"
         return response

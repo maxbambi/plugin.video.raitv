@@ -570,7 +570,7 @@ def get_raisport_items(params):
     for i in range(0, len(sub_keys)):
         key = sub_keys[i]
         title = key.split("|")[0]
-        title = HTMLParser.HTMLParser().unescape(title).encode('utf-8')
+        title = utils.checkStr(HTMLParser.HTMLParser().unescape(title))
         if i==0:
             title = "Tutto su " + title
         

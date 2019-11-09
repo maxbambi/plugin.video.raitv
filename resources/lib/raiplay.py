@@ -10,6 +10,7 @@ try:
 except ImportError:
 	import html.parser as HTMLParser
 import xbmc
+import resources.lib.utils as utils
 
 class RaiPlay:
     # Raiplay android app
@@ -42,7 +43,7 @@ class RaiPlay:
         
     def getCountry(self):
         try:
-            response = urllib2.urlopen(self.localizeUrl).read()
+            response = utils.checkStr(urllib2.urlopen(self.localizeUrl).read())
         except urllib2.HTTPError:
             response = "ERROR"
         return response
@@ -53,7 +54,11 @@ class RaiPlay:
     
     def getRaiSportLivePage(self):
         chList = []
-        response = urllib2.urlopen(self.RaiSportLiveUrl).read()
+        try:
+            response = utils.checkStr(urllib2.urlopen(self.RaiSportLiveUrl).read())
+        except urllib2.HTTPError:
+            response = ''
+            
         m = re.search('<ul class="canali">(?P<list>.*)</ul>', response, re.S)
         if m:
             channels = re.findall ('<li>(.*?)</li>', m.group('list'), re.S)
@@ -72,14 +77,18 @@ class RaiPlay:
                     else:
                         title = 'Rai Sport Web Link'
                     chList.append({'title':title, 'url':url, 'icon':icon})
-        
+
         return chList
     
     def fillRaiSportKeys(self):
         # search for items in main menu
         RaiSportKeys=[]
         
-        data = urllib2.urlopen(self.RaiSportMainUrl).read()
+        try:        
+            data = utils.checkStr(urllib2.urlopen(self.RaiSportMainUrl).read())
+        except urllib2.HTTPError:
+            data = ''
+        
         m = re.search("<a href=\"javascript:void\(0\)\">Menu</a>(.*?)</div>", data,re.S)
         if not m: 
             return []
@@ -96,7 +105,10 @@ class RaiPlay:
         # open any single page in list and grab search keys
         
         for l in good_links:
-            data = urllib2.urlopen(self.RaiSportMainUrl + l['url']).read()
+            try:
+                data = utils.checkStr(urllib2.urlopen(self.RaiSportMainUrl + l['url']).read())
+            except urllib2.HTTPError:
+                data = ''
 
             dataDominio= re.findall("data-dominio=\"(.*?)\"", data)
             dataTematica = re.findall("data-tematica=\"(.*?)\"", data)
@@ -107,7 +119,7 @@ class RaiPlay:
         
                 try:
                     title=dataTematica[0].split('|')[0]
-                    title = HTMLParser.HTMLParser().unescape(title).encode('utf-8')
+                    title = utils.checkStr(HTMLParser.HTMLParser().unescape(title))
                     params={'title': title, 'dominio': dataDominio[0], 'sub_keys' : dataTematica}
                 
                     RaiSportKeys.append(params)
@@ -143,8 +155,8 @@ class RaiPlay:
         response = urllib2.urlopen(req)
         if response.code != 200:
             return []
-        
-        data = response.read()
+
+        data = utils.checkStr(response.read())
         j = json.loads(data)
         
         if 'hits' in j:
@@ -198,7 +210,11 @@ class RaiPlay:
         url = self.palinsestoUrlHtml
         url = url.replace("[idCanale]", channelTag)
         url = url.replace("[dd-mm-yyyy]", epgDate)
-        return urllib2.urlopen(url).read()
+        try:
+            data = utils.checkStr(urllib2.urlopen(url).read())
+        except urllib2.HTTPError:
+            data = ''
+        return data
         
     def getMainMenu(self):
         response = json.load(urllib2.urlopen(self.menuUrl))
@@ -239,13 +255,6 @@ class RaiPlay:
         if url.endswith(".html"):
             url = url.replace(".html",".json")
             
-        #data = urllib2.urlopen(url).read()
-
-        #s_name = re.findall("\"name\": \"(.*?)\",", data)
-        #for s in s_name:
-        #    data = data.replace(s , s.replace("\""," "))
-        #response = json.loads(data)
-
         response = json.load(urllib2.urlopen(url))
         
         return response["video"]
