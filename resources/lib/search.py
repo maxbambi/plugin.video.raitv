@@ -5,6 +5,7 @@ try:
   import urllib.request as urllib2
 except ImportError:
     import urllib2
+import resources.lib.utils as utils
 
 class Search:
     baseUrl = "http://www.rai.it"
