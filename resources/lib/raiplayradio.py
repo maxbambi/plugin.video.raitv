@@ -35,7 +35,7 @@ class RaiPlayRadio:
         return response
         
     def getChannels(self):
-        response = json.load(urllib2.urlopen(self.channelsUrl))
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.channelsUrl).read()))
         return response["dirette"]
         
     def getProgrammes(self, channelName, epgDate):
@@ -44,12 +44,12 @@ class RaiPlayRadio:
         url = self.palinsestoUrl
         url = url.replace("[nomeCanale]", channelTag)
         url = url.replace("[dd-mm-yyyy]", epgDate)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response[channelName][0]["palinsesto"][0]["programmi"]
     
     def getAudioMetadata(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response["audio"]
     
     def getUrl(self, pathId):

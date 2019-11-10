@@ -49,7 +49,7 @@ class RaiPlay:
         return response
         
     def getChannels(self):
-        response = json.load(urllib2.urlopen(self.channelsUrl))
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.channelsUrl).read()))
         return response["dirette"]
     
     def getRaiSportLivePage(self):
@@ -202,7 +202,7 @@ class RaiPlay:
         url = self.palinsestoUrl
         url = url.replace("[nomeCanale]", channelTag)
         url = url.replace("[dd-mm-yyyy]", epgDate)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         try:
             oRetVal = response[channelName][0]["palinsesto"][0]["programmi"]
         except:
@@ -221,37 +221,37 @@ class RaiPlay:
         return data
         
     def getMainMenu(self):
-        response = json.load(urllib2.urlopen(self.menuUrl))
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.menuUrl).read()))
         return response["menu"]
 
     # RaiPlay Genere Page
     # RaiPlay Tipologia Page
     def getCategory(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response["contents"]
   
     # Raiplay Tipologia Item
     def getProgrammeList(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response["contents"]
 
     # Raiplay AZ List
     def getProgrammeListOld(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response
       
     #  PLR programma Page
     def getProgramme(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response
         
     def getContentSet(self, url):
         url = self.getUrl(url)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response["items"]
     
     def getVideoMetadata(self, pathId):
@@ -259,13 +259,13 @@ class RaiPlay:
         if url.endswith(".html"):
             url = url.replace(".html",".json")
             
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         
         return response["video"]
     
     def getIndexFromJSON(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         
         index = []
         for i in response["contents"]:
