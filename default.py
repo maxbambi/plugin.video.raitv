@@ -521,8 +521,7 @@ def show_themes():
     search = Search()
     for position, tematica in enumerate(search.tematiche):
         liStyle = xbmcgui.ListItem(tematica)
-        addDirectoryItem({"mode": "get_last_content_by_tag",
-            "tags": "Tematica:"+search.tematiche[int(position)]}, liStyle)
+        addDirectoryItem({"mode": "get_last_content_by_tag", "tags": "Tematica:"+search.tematiche[int(position)]}, liStyle)
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     

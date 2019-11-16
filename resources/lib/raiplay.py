@@ -204,7 +204,8 @@ class RaiPlay:
         url = url.replace("[dd-mm-yyyy]", epgDate)
         response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         try:
-            oRetVal = response[channelName][0]["palinsesto"][0]["programmi"]
+            key = channelName if channelName in response else ''
+            oRetVal = response[key][0]["palinsesto"][0]["programmi"]
         except:
             oRetVal = None
         return oRetVal
