@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 try:
-  import urllib.request as urllib2
+    import urllib.request as urllib2
 except ImportError:
     import urllib2
 import json
 import re
 try:
-	import HTMLParser
+    import HTMLParser
 except ImportError:
-	import html.parser as HTMLParser
+    import html.parser as HTMLParser
 import xbmc
 import resources.lib.utils as utils
 
@@ -233,53 +233,73 @@ class RaiPlay:
     # RaiPlay Tipologia Page
     def getCategory(self, pathId):
         url = self.getUrl(pathId)
-        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
-        return response["contents"]
-  
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response["contents"]
+        except: 
+            return []
+        
     # Raiplay Tipologia Item
     def getProgrammeList(self, pathId):
         url = self.getUrl(pathId)
-        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
-        return response["contents"]
-
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response["contents"]
+        except:
+            return []
+        
     # Raiplay AZ List
     def getProgrammeListOld(self, pathId):
         url = self.getUrl(pathId)
-        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
-        return response
-      
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response
+        except:
+            return []
+        
     #  PLR programma Page
     def getProgramme(self, pathId):
         url = self.getUrl(pathId)
-        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
-        return response
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response
+        except:
+            return[]
         
     def getContentSet(self, url):
         url = self.getUrl(url)
-        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
-        return response["items"]
-    
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response["items"]
+        except:
+            return []
+        
     def getVideoMetadata(self, pathId):
         url = self.getUrl(pathId)
         if url.endswith(".html"):
             url = url.replace(".html",".json")
             
-        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response["video"]
+        except:
+            return []
         
-        return response["video"]
-    
     def getIndexFromJSON(self, pathId):
         url = self.getUrl(pathId)
-        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         
-        index = []
-        for i in response["contents"]:
-          if len(response["contents"][i])>0:
-            index.append(i)
+            index = []
+            for i in response["contents"]:
+                if len(response["contents"][i])>0:
+                    index.append(i)
         
-        index.sort()
-        return index
-    
+            index.sort()
+            return index
+        except:
+            return []
+        
     def getUrl(self, pathId):
         url = pathId.replace(" ", "%20")
         
