@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.raitv"
        name="Rai Play"
-       version="3.4.2"
+       version="3.4.3"
        provider-name="Nightflyer, cttynul, maxbambi">
   <requires>
     	<import addon="xbmc.python" version="2.25.0"/>
-	<import addon="script.common.plugin.cache" version="2.5.0"/>
+	<import addon="script.common.plugin.cache" version="2.6.0"/>
   </requires>
   <extension point="xbmc.python.pluginsource"
             library="default.py">
@@ -23,6 +23,11 @@
     <website>https://github.com/maxbambi/plugin.video.raitv/</website>
     <email></email>
     <news>
+[B]3.4.2[/B]
+Added new section from home page of Raiplay.
+Using updated library 'script.common.plugin.cache'. 
+You can download it from https://github.com/anxdpanic/script.common.plugin.cache  
+
 [B]3.4.2[/B]
 Fix json problem with epg 
 

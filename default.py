@@ -6,6 +6,8 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 import urllib
+import json
+
 try:
     import urllib.parse as urlparse
 except ImportError:
@@ -16,7 +18,7 @@ except:
     from urllib import urlencode
 import datetime
 
-from resources.lib import StorageServer
+import StorageServer
 
 from resources.lib.tgr import TGR
 from resources.lib.search import Search
@@ -66,6 +68,8 @@ def addLinkItem(parameters, li, url=""):
 # UI builder functions
 def show_root_menu():
     ''' Show the plugin root menu '''
+    liStyle = xbmcgui.ListItem("Home Page")
+    addDirectoryItem({"mode": "home"}, liStyle)
     liStyle = xbmcgui.ListItem(Addon.getLocalizedString(32002))
     addDirectoryItem({"mode": "live_tv"}, liStyle)
     liStyle = xbmcgui.ListItem(Addon.getLocalizedString(32003))
@@ -214,6 +218,74 @@ def show_radio_stations():
         
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
+def show_home():
+    raiplay = RaiPlay()
+    response = raiplay.getHomePage()
+    
+    for item in response:
+        item_type = item.get("type","")
+        
+        if item_type == "RaiPlay Hero Block":
+            for item2 in item["contents"]:
+                sub_type = item2["type"]
+                liStyle = xbmcgui.ListItem("In evidenza: %s" % item2['name'])
+                liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item2["images"]["landscape"])})
+
+                if sub_type == "RaiPlay Diretta Item":
+                    liStyle.setInfo("video", {})
+                    addLinkItem({"mode": "play", "url": item2["path_id"]}, liStyle)
+                elif sub_type == "RaiPlay Programma Item":
+                    addDirectoryItem({"mode": "ondemand", "path_id": item2["path_id"], "sub_type": sub_type }, liStyle)
+                else:                    
+                    addDirectoryItem({"mode": "ondemand", "path_id": item2["path_id"], "sub_type": sub_type }, liStyle)
+
+        elif item_type == "RaiPlay Configuratore Fascia Recommendation Item":
+            if not item['name'].startswith('RCM'):
+                liStyle = xbmcgui.ListItem(item['name'])
+                if "fallback_list" in item:
+                    addDirectoryItem({"mode": "ondemand_collection", "path_id": item["fallback_list"]}, liStyle)
+        elif "Slider" in item_type: 
+            # populate subItems array
+            subItems=[]
+            for item2 in item["contents"]:
+                subItems.append({"mode": "ondemand", "name": item2["name"], "path_id": item2["path_id"], "video_url": item2.get("video_url",""), "sub_type": item2["type"], "icon": raiplay.getThumbnailUrl(item2["images"]["landscape"])})
+                
+            liStyle = xbmcgui.ListItem(item['name'])
+            addDirectoryItem({"mode": "ondemand_slider", "sub_items": json.dumps(subItems)}, liStyle)
+        
+    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
+
+def show_collection(pathId):
+    xbmc.log("Raiplay.show_collection with PathID: %s" % pathId )
+    raiplay = RaiPlay()
+    xbmc.log("Url: " + raiplay.getUrl(pathId))
+   
+    response = raiplay.getCategory(pathId)
+
+    for item in response:
+        liStyle = xbmcgui.ListItem(item["name"])
+        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
+        addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": item["type"]}, liStyle)
+    
+    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
+    
+def show_slider_items(subItems):
+    xbmc.log("Raiplay.show_slider_items")
+    raiplay = RaiPlay()
+
+    subItems= json.loads(subItems)
+    for item in subItems:
+        liStyle = xbmcgui.ListItem(item.get("name",""))
+        liStyle.setArt({"thumb": item["icon"]})
+        if item.get("sub_type","") == "RaiPlay Video Item":
+            liStyle.setInfo("video", {})
+            addLinkItem({"mode": "play", "url": item["video_url"]}, liStyle)
+        else:
+            addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": item["sub_type"]}, liStyle)
+    
+    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
+        
+    
 def show_replay_dates(media):
     days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"]
     months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", 
@@ -379,7 +451,7 @@ def show_ondemand_root():
                 addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
     
     # add new item not in old json
-    liStyle = xbmcgui.ListItem("Performing Arts")
+    liStyle = xbmcgui.ListItem("Musica e Teatro")
     addDirectoryItem({"mode": "ondemand", "path_id": "https://www.raiplay.it/performing-arts/index.json", "sub_type": "RaiPlay Tipologia Page"}, liStyle)
 
     liStyle = xbmcgui.ListItem("Cerca")
@@ -628,6 +700,9 @@ if mode == "live_tv":
 elif mode == "live_radio":
     show_radio_stations()
 
+elif mode == "home":
+    show_home()
+    
 elif mode == "replay":
     if date == "":
         show_replay_dates(media)
@@ -663,7 +738,12 @@ elif mode == "ondemand_items":
     show_ondemand_items(url)
 elif mode == "ondemand_search_by_name":
     search_ondemand_programmes()
-
+elif mode == "ondemand_collection":
+    show_collection(pathId)
+elif mode == "ondemand_slider":
+    subItems = params.get("sub_items", [])
+    show_slider_items(subItems)
+    
 elif mode == "tg":
     show_tg_root()
 elif mode == "tgr":

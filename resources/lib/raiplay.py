@@ -52,6 +52,10 @@ class RaiPlay:
         response = json.loads(utils.checkStr(urllib2.urlopen(self.channelsUrl).read()))
         return response["dirette"]
     
+    def getHomePage(self):
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + 'index.json').read()))
+        return response["contents"]
+      
     def getRaiSportLivePage(self):
         chList = []
         try:
