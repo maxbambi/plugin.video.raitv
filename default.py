@@ -224,7 +224,7 @@ def show_home():
     
     for item in response:
         item_type = item.get("type","")
-        
+
         if item_type == "RaiPlay Hero Block":
             for item2 in item["contents"]:
                 sub_type = item2["type"]
@@ -234,9 +234,16 @@ def show_home():
                 if sub_type == "RaiPlay Diretta Item":
                     liStyle.setInfo("video", {})
                     addLinkItem({"mode": "play", "url": item2["path_id"]}, liStyle)
-                elif sub_type == "RaiPlay Programma Item":
+                elif sub_type == "RaiPlay V2 Lancio Item":
+                    if item2["sub_type"] == "RaiPlay Video Item":
+                        liStyle.setInfo("video", {})
+                        addLinkItem({"mode": "play", "path_id": item2["path_id"]}, liStyle)
+                    else:
+                        xbmc.log("Not handled sub-type in Hero Block: '%s'" % item2["sub_type"])
+                elif sub_type == "RaiPlay Programma Item" :
                     addDirectoryItem({"mode": "ondemand", "path_id": item2["path_id"], "sub_type": sub_type }, liStyle)
                 else:                    
+                    xbmc.log("Not handled type in Hero Block: '%s'" % sub_type)
                     addDirectoryItem({"mode": "ondemand", "path_id": item2["path_id"], "sub_type": sub_type }, liStyle)
 
         elif item_type == "RaiPlay Configuratore Fascia Recommendation Item":
