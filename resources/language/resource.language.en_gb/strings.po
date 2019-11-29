@@ -55,3 +55,7 @@ msgstr "Thematic areas"
 msgctxt "#32010"
 msgid "Rai Sport Archive"
 msgstr "Rai Sport Archive"
+
+msgctxt "#32011"
+msgid "Show all"
+msgstr "Show all"

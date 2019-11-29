@@ -215,9 +215,15 @@ def show_radio_stations():
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_replay_dates(media):
-    days = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"]
-    months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", 
-        "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"]
+    days = []
+    months = []
+    days.append(xbmc.getLocalizedString(17))
+    for idxDay in range(11, 17):
+        days.append(xbmc.getLocalizedString(idxDay))
+        
+    for idxMonth in range(21, 33):
+        xbmc.log(xbmc.getLocalizedString(idxMonth))
+        months.append(xbmc.getLocalizedString(idxMonth))
     
     epgEndDate = datetime.date.today()
     epgStartDate = datetime.date.today() - datetime.timedelta(days=7)
@@ -419,6 +425,7 @@ def show_ondemand_list(pathId):
         liStyle = xbmcgui.ListItem(i)
         addDirectoryItem({"mode": "ondemand_list", "index": i, "path_id": pathId}, liStyle)
     
+    addDirectoryItem({"mode": "ondemand_list_all", "index": len(index)+1, "path_id": pathId}, xbmcgui.ListItem(Addon.getLocalizedString(32011)))
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_ondemand_index(index, pathId):
@@ -433,6 +440,19 @@ def show_ondemand_index(index, pathId):
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
+def show_ondemand_index_all(index, pathId):
+    xbmc.log("Raiplay.show_ondemand_index_all with index from 0 to %sS and PathID: %s" % (index, pathId) )
+    raiplay = RaiPlay()
+    dir = raiplay.getProgrammeList(pathId)
+    dictKeys = dir.keys();
+    for currKey in dictKeys:
+        for item in dir[currKey]:
+            liStyle = xbmcgui.ListItem(item["name"])
+            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
+            addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": item["type"]}, liStyle)
+    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
+    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
+    
 def show_ondemand_programme(pathId):
     xbmc.log("Raiplay.show_ondemand_programme with PathID: %s" % pathId)
     raiplay = RaiPlay()
@@ -660,6 +680,8 @@ elif mode == "ondemand":
         xbmc.log("Unhandled sub-type: " + subType)
 elif mode == "ondemand_list":
         show_ondemand_index(index, pathId)
+elif mode == "ondemand_list_all":
+        show_ondemand_index_all(index, pathId)
 elif mode == "ondemand_items":
     show_ondemand_items(url)
 elif mode == "ondemand_search_by_name":

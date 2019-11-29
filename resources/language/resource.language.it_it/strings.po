@@ -55,3 +55,7 @@ msgstr "Aree tematiche"
 msgctxt "#32010"
 msgid "Rai Sport Archive"
 msgstr "Archivio Rai Sport"
+
+msgctxt "#32011"
+msgid "Show all"
+msgstr "Tutti"
