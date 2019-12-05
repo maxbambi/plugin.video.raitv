@@ -26,6 +26,7 @@ class RaiPlay:
     menuUrl = "http://www.rai.it/dl/RaiPlay/2016/menu/PublishingBlock-20b274b1-23ae-414f-b3bf-4bdc13b86af2.html?homejson"
     palinsestoUrl = "https://www.raiplay.it/palinsesto/app/old/[nomeCanale]/[dd-mm-yyyy].json"
     palinsestoUrlHtml = "https://www.raiplay.it/palinsesto/guidatv/lista/[idCanale]/[dd-mm-yyyy].html"
+    onAirUrl = "https://www.raiplay.it/palinsesto/onAir.json" 
     AzTvShowPath = "/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json"
     
     # Rai Sport urls
@@ -51,6 +52,10 @@ class RaiPlay:
     def getChannels(self):
         response = json.loads(utils.checkStr(urllib2.urlopen(self.channelsUrl).read()))
         return response["dirette"]
+    
+    def getOnAir(self):
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.onAirUrl).read()))
+        return response["on_air"]
     
     def getHomePage(self):
         response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + 'index.json').read()))

@@ -187,9 +187,23 @@ def show_tv_channels():
     xbmc.log("Raiplay: get Rai channels: ")
 
     raiplay = RaiPlay()
+    onAirJson = raiplay.getOnAir()
+    
     for station in tv_stations:
-        liStyle = xbmcgui.ListItem(station["channel"])
-        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
+        chName = station["channel"]
+        current = ""
+        for d in onAirJson:
+            if chName == d["channel"]:
+                current = d["currentItem"].get("name","")
+                thumb = d["currentItem"].get("image","")
+                chName = "[COLOR yellow]" + chName + "[/COLOR]: " + current
+                break
+        
+        liStyle = xbmcgui.ListItem(chName)
+        if thumb:
+            liStyle.setArt({"thumb": raiplay.getUrl(thumb)})
+        else:
+            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
         liStyle.setInfo("video", {})
         addLinkItem({"mode": "play",
             "url": station["video"]["contentUrl"]}, liStyle)
@@ -199,7 +213,7 @@ def show_tv_channels():
     chList = raiplay.getRaiSportLivePage()
     xbmc.log(str(chList))
     for ch in chList:
-        liStyle = xbmcgui.ListItem(ch['title'])
+        liStyle = xbmcgui.ListItem("[COLOR green]" + ch['title'] + "[/COLOR]")
         liStyle.setArt({"thumb": ch['icon']})
         liStyle.setInfo("video", {})
         addLinkItem({"mode": "play", "url": ch["url"]}, liStyle)
@@ -228,7 +242,7 @@ def show_home():
         if item_type == "RaiPlay Hero Block":
             for item2 in item["contents"]:
                 sub_type = item2["type"]
-                liStyle = xbmcgui.ListItem("In evidenza: %s" % item2['name'])
+                liStyle = xbmcgui.ListItem("%s: %s" % (Addon.getLocalizedString(32013), item2['name']))
                 liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item2["images"]["landscape"])})
 
                 if sub_type == "RaiPlay Diretta Item":
@@ -247,10 +261,16 @@ def show_home():
                     addDirectoryItem({"mode": "ondemand", "path_id": item2["path_id"], "sub_type": sub_type }, liStyle)
 
         elif item_type == "RaiPlay Configuratore Fascia Recommendation Item":
-            if not item['name'].startswith('RCM'):
-                liStyle = xbmcgui.ListItem(item['name'])
+            title = item['name']
+            if title.find('RCM') > 0:
+                title = title[0:title.find('RCM')]
+            if title.find('HP') > 0:
+                title = title[0:title.find('HP')]
+            if title.strip():
+                liStyle = xbmcgui.ListItem(title)
                 if "fallback_list" in item:
-                    addDirectoryItem({"mode": "ondemand_collection", "path_id": item["fallback_list"]}, liStyle)
+                    if item["fallback_list"]:
+                        addDirectoryItem({"mode": "ondemand_collection", "path_id": item["fallback_list"]}, liStyle)
         elif "Slider" in item_type: 
             # populate subItems array
             subItems=[]
