@@ -28,9 +28,9 @@ from resources.lib.relinker import Relinker
 import resources.lib.utils as utils
 import re
 try:
-	import HTMLParser
+    import HTMLParser
 except:
-	import html.parser as HTMLParser
+    import html.parser as HTMLParser
 
 # plugin constants
 __plugin__ = "plugin.video.raitv"
@@ -43,9 +43,9 @@ handle = int(sys.argv[1])
 
 # Cache channels for 1 hour
 cache = StorageServer.StorageServer("plugin.video.raitv", 1) # (Your plugin name, Cache time in hours)
-tv_stations = cache.cacheFunction(RaiPlay().getChannels)
+tv_stations = cache.cacheFunction(RaiPlay(Addon).getChannels)
 radio_stations = cache.cacheFunction(RaiPlayRadio().getChannels)
-raisport_keys = cache.cacheFunction(RaiPlay().fillRaiSportKeys)
+raisport_keys = cache.cacheFunction(RaiPlay(Addon).fillRaiSportKeys)
 
 # utility functions
 def parameters_string_to_dict(parameters):
@@ -153,7 +153,7 @@ def play(url, pathId="", srt=[]):
             url = metadata["contentUrl"]
             srtUrl = ""
         else:
-            raiplay = RaiPlay()
+            raiplay = RaiPlay(Addon)
             xbmc.log("Url: " + raiplay.getUrl(pathId))
             metadata = raiplay.getVideoMetadata(pathId)
             url = metadata["content_url"]
@@ -186,10 +186,24 @@ def play(url, pathId="", srt=[]):
 def show_tv_channels():
     xbmc.log("Raiplay: get Rai channels: ")
 
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
+    onAirJson = raiplay.getOnAir()
+    
     for station in tv_stations:
-        liStyle = xbmcgui.ListItem(station["channel"])
-        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
+        chName = station["channel"]
+        current = ""
+        for d in onAirJson:
+            if chName == d["channel"]:
+                current = d["currentItem"].get("name","")
+                thumb = d["currentItem"].get("image","")
+                chName = "[COLOR yellow]" + chName + "[/COLOR]: " + current
+                break
+        
+        liStyle = xbmcgui.ListItem(chName)
+        if thumb:
+            liStyle.setArt({"thumb": raiplay.getUrl(thumb)})
+        else:
+            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
         liStyle.setInfo("video", {})
         addLinkItem({"mode": "play",
             "url": station["video"]["contentUrl"]}, liStyle)
@@ -199,7 +213,7 @@ def show_tv_channels():
     chList = raiplay.getRaiSportLivePage()
     xbmc.log(str(chList))
     for ch in chList:
-        liStyle = xbmcgui.ListItem(ch['title'])
+        liStyle = xbmcgui.ListItem("[COLOR green]" + ch['title'] + "[/COLOR]")
         liStyle.setArt({"thumb": ch['icon']})
         liStyle.setInfo("video", {})
         addLinkItem({"mode": "play", "url": ch["url"]}, liStyle)
@@ -219,7 +233,7 @@ def show_radio_stations():
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_home():
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     response = raiplay.getHomePage()
     
     for item in response:
@@ -228,7 +242,7 @@ def show_home():
         if item_type == "RaiPlay Hero Block":
             for item2 in item["contents"]:
                 sub_type = item2["type"]
-                liStyle = xbmcgui.ListItem("In evidenza: %s" % item2['name'])
+                liStyle = xbmcgui.ListItem("%s: %s" % (Addon.getLocalizedString(32013), item2['name']))
                 liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item2["images"]["landscape"])})
 
                 if sub_type == "RaiPlay Diretta Item":
@@ -247,10 +261,16 @@ def show_home():
                     addDirectoryItem({"mode": "ondemand", "path_id": item2["path_id"], "sub_type": sub_type }, liStyle)
 
         elif item_type == "RaiPlay Configuratore Fascia Recommendation Item":
-            if not item['name'].startswith('RCM'):
-                liStyle = xbmcgui.ListItem(item['name'])
+            title = item['name']
+            if title.find('RCM') > 0:
+                title = title[0:title.find('RCM')]
+            if title.find('HP') > 0:
+                title = title[0:title.find('HP')]
+            if title.strip():
+                liStyle = xbmcgui.ListItem(title)
                 if "fallback_list" in item:
-                    addDirectoryItem({"mode": "ondemand_collection", "path_id": item["fallback_list"]}, liStyle)
+                    if item["fallback_list"]:
+                        addDirectoryItem({"mode": "ondemand_collection", "path_id": item["fallback_list"]}, liStyle)
         elif "Slider" in item_type: 
             # populate subItems array
             subItems=[]
@@ -264,7 +284,7 @@ def show_home():
 
 def show_collection(pathId):
     xbmc.log("Raiplay.show_collection with PathID: %s" % pathId )
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     xbmc.log("Url: " + raiplay.getUrl(pathId))
    
     response = raiplay.getCategory(pathId)
@@ -278,7 +298,7 @@ def show_collection(pathId):
     
 def show_slider_items(subItems):
     xbmc.log("Raiplay.show_slider_items")
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
 
     subItems= json.loads(subItems)
     for item in subItems:
@@ -315,7 +335,7 @@ def show_replay_dates(media):
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
 def show_replay_tv_channels(date):
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     for station in tv_stations:
         liStyle = xbmcgui.ListItem(station["channel"])
         liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
@@ -338,7 +358,7 @@ def show_replay_radio_channels(date):
 
 def show_replay_tv_epg(date, channelId):
     xbmc.log("Showing EPG for " + channelId + " on " + date)
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     programmes = raiplay.getProgrammes(channelId, date)
     if(programmes):
         for programme in programmes:
@@ -454,7 +474,7 @@ def show_replay_radio_epg(date, channelId):
     
 def show_ondemand_root():
     xbmc.log("Raiplay.show_ondemand_root")
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     items = raiplay.getMainMenu()
     for item in items:
         if item["sub-type"] in ("RaiPlay Tipologia Page", "RaiPlay Genere Page", "RaiPlay Tipologia Editoriale Page" ):
@@ -473,7 +493,7 @@ def show_ondemand_root():
     
 def show_ondemand_programmes(pathId):
     xbmc.log("Raiplay.show_ondemand_programmes with PathID: %s" % pathId )
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     xbmc.log("Url: " + raiplay.getUrl(pathId))
    
     blocchi = raiplay.getCategory(pathId)
@@ -494,7 +514,7 @@ def show_ondemand_programmes(pathId):
 def show_ondemand_list(pathId):
     xbmc.log("Raiplay.show_ondemand_list with PathID: %s" % pathId )
     # indice ottenuto dal json
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     xbmc.log("Url: %s" % raiplay.getUrl(pathId) )
     
     index = raiplay.getIndexFromJSON(pathId)
@@ -510,7 +530,7 @@ def show_ondemand_list(pathId):
 def show_ondemand_index(index, pathId):
     xbmc.log("Raiplay.show_ondemand_index with index %s and PathID: %s" % (index, pathId) )
 
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     dir = raiplay.getProgrammeList(pathId)
     for item in dir[index]:
         liStyle = xbmcgui.ListItem(item["name"])
@@ -521,7 +541,7 @@ def show_ondemand_index(index, pathId):
 
 def show_ondemand_index_all(index, pathId):
     xbmc.log("Raiplay.show_ondemand_index_all with index from 0 to %sS and PathID: %s" % (index, pathId) )
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     dir = raiplay.getProgrammeList(pathId)
     dictKeys = dir.keys();
     for currKey in dictKeys:
@@ -534,7 +554,7 @@ def show_ondemand_index_all(index, pathId):
     
 def show_ondemand_programme(pathId):
     xbmc.log("Raiplay.show_ondemand_programme with PathID: %s" % pathId)
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     xbmc.log("Url: %s" % raiplay.getUrl(pathId))
     
     programme = raiplay.getProgramme(pathId)
@@ -564,7 +584,7 @@ def show_ondemand_programme(pathId):
 def show_ondemand_items(url):
     xbmc.log("Raiplay.show_ondemand_item with ContentSet Url: %s" % url )
 
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     items = raiplay.getContentSet(url)
     for item in items:
         title = item["name"]
@@ -584,7 +604,7 @@ def search_ondemand_programmes():
         try: name = kb.getText().decode('utf8').lower()
         except: name = kb.getText().lower()
         xbmc.log("Searching for programme: " + name)
-        raiplay = RaiPlay()
+        raiplay = RaiPlay(Addon)
         # old style of json
         dir = raiplay.getProgrammeListOld(raiplay.AzTvShowPath)
         for letter in dir:
@@ -637,7 +657,7 @@ def get_most_visited(tags):
     show_search_result(items)
 
 def show_search_result(items):
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     
     for item in items:
         liStyle = xbmcgui.ListItem(item["name"])
@@ -651,7 +671,7 @@ def show_search_result(items):
     
 def get_raisport_main():
     xbmc.log("Build Rai Sport menu with search keys....")
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     
     for k in raisport_keys:
         liStyle = xbmcgui.ListItem(k['title'])
@@ -680,7 +700,7 @@ def get_raisport_items(params):
             
 def get_raisport_videos(params):
     xbmc.log("Build Rai Sport video list for %s " % params)
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
 
     key = params.get('key','')
     dominio = params.get('dominio','')
@@ -702,7 +722,7 @@ def get_raisport_videos(params):
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def log_country():
-    raiplay = RaiPlay()
+    raiplay = RaiPlay(Addon)
     country = raiplay.getCountry()
     xbmc.log("RAI geolocation: %s" % country)
 
