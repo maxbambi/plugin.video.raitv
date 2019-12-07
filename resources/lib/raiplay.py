@@ -36,13 +36,12 @@ class RaiPlay:
     RaiSportSearchUrl = RaiSportMainUrl +  "/atomatic/news-search-service/api/v1/search?transform=false"
     RaiPlayAddonHandle = None
     
-    
     def __init__(self, addonHandle):
         opener = urllib2.build_opener()
         # Set User-Agent
         opener.addheaders = [('User-Agent', self.UserAgent)]
         urllib2.install_opener(opener)
-        RaiPlayAddonHandle = addonHandle
+        self.RaiPlayAddonHandle = addonHandle
         
     def getCountry(self):
         try:
@@ -86,7 +85,7 @@ class RaiPlay:
                     if title:
                         title = title.group('title')
                     else:
-                        title = RaiPlayAddonHandle.getLocalizedString(32014)
+                        title = self.RaiPlayAddonHandle.getLocalizedString(32014)
                     chList.append({'title':title, 'url':url, 'icon':icon})
         
         return chList
@@ -111,7 +110,7 @@ class RaiPlay:
             if ('/archivio.html?' in l[0]) and not ('&amp;' in l[0]):
                 good_links.append({'title': l[1], 'url' : l[0]})
         
-        good_links.append({'title': RaiPlayAddonHandle.getLocalizedString(32015), 'url' : '/archivio.html?tematica=altri-sport'})
+        good_links.append({'title': self.RaiPlayAddonHandle.getLocalizedString(32015), 'url' : '/archivio.html?tematica=altri-sport'})
         
         # open any single page in list and grab search keys
         
