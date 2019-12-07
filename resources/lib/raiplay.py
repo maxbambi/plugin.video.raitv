@@ -34,13 +34,15 @@ class RaiPlay:
     RaiSportLiveUrl= RaiSportMainUrl + '/dirette.html'
     RaiSportArchivioUrl = RaiSportMainUrl + '/archivio.html'        
     RaiSportSearchUrl = RaiSportMainUrl +  "/atomatic/news-search-service/api/v1/search?transform=false"
-
+    RaiPlayAddonHandle = None
     
-    def __init__(self):
+    
+    def __init__(self, addonHandle):
         opener = urllib2.build_opener()
         # Set User-Agent
         opener.addheaders = [('User-Agent', self.UserAgent)]
         urllib2.install_opener(opener)
+        RaiPlayAddonHandle = addonHandle
         
     def getCountry(self):
         try:
@@ -84,9 +86,9 @@ class RaiPlay:
                     if title:
                         title = title.group('title')
                     else:
-                        title = 'Rai Sport Web Link'
+                        title = RaiPlayAddonHandle.getLocalizedString(32014)
                     chList.append({'title':title, 'url':url, 'icon':icon})
-
+        
         return chList
     
     def fillRaiSportKeys(self):
@@ -109,7 +111,7 @@ class RaiPlay:
             if ('/archivio.html?' in l[0]) and not ('&amp;' in l[0]):
                 good_links.append({'title': l[1], 'url' : l[0]})
         
-        good_links.append({'title': 'Altri sport', 'url' : '/archivio.html?tematica=altri-sport'})
+        good_links.append({'title': RaiPlayAddonHandle.getLocalizedString(32015), 'url' : '/archivio.html?tematica=altri-sport'})
         
         # open any single page in list and grab search keys
         
@@ -165,10 +167,10 @@ class RaiPlay:
         except TypeError:
             req = urllib2.Request(self.RaiSportSearchUrl, postData.encode('utf-8'), header)
             response = urllib2.urlopen(req)
-          
+        
         if response.code != 200:
             return []
-
+        
         data = utils.checkStr(response.read())
         j = json.loads(data)
         
@@ -243,7 +245,7 @@ class RaiPlay:
             return response["contents"]
         except: 
             return []
-        
+  
     # Raiplay Tipologia Item
     def getProgrammeList(self, pathId):
         url = self.getUrl(pathId)
@@ -252,7 +254,7 @@ class RaiPlay:
             return response["contents"]
         except:
             return []
-        
+
     # Raiplay AZ List
     def getProgrammeListOld(self, pathId):
         url = self.getUrl(pathId)
@@ -261,7 +263,7 @@ class RaiPlay:
             return response
         except:
             return []
-        
+      
     #  PLR programma Page
     def getProgramme(self, pathId):
         url = self.getUrl(pathId)
@@ -278,7 +280,7 @@ class RaiPlay:
             return response["items"]
         except:
             return []
-        
+    
     def getVideoMetadata(self, pathId):
         url = self.getUrl(pathId)
         if url.endswith(".html"):
@@ -289,7 +291,7 @@ class RaiPlay:
             return response["video"]
         except:
             return []
-        
+    
     def getIndexFromJSON(self, pathId):
         url = self.getUrl(pathId)
         try:
@@ -297,14 +299,14 @@ class RaiPlay:
         
             index = []
             for i in response["contents"]:
-                if len(response["contents"][i])>0:
-                    index.append(i)
+              if len(response["contents"][i])>0:
+                index.append(i)
         
             index.sort()
             return index
         except:
             return []
-        
+    
     def getUrl(self, pathId):
         url = pathId.replace(" ", "%20")
         

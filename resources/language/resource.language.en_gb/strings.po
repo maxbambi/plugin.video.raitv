@@ -68,3 +68,10 @@ msgctxt "#32013"
 msgid "Highlighted"
 msgstr "Highlighted"
 
+msgctxt "#32014"
+msgid "RaiSportWebLink"
+msgstr "Rai Sport Web Link"
+
+msgctxt "#32015"
+msgid "OtherSports"
+msgstr "Other sports"
