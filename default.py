@@ -366,7 +366,7 @@ def show_replay_tv_epg(date, channelId):
                 continue
 
             startTime = programme["timePublished"]
-            title = programme["name"]
+            title = programme["name"].replace("\n"," ")
 
             if programme["images"]["landscape"] != "":
                 thumb = raiplay.getThumbnailUrl(programme["images"]["landscape"])
