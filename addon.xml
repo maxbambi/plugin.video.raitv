@@ -23,6 +23,7 @@
     <website>https://github.com/maxbambi/plugin.video.raitv/</website>
     <email></email>
     <news>
+
 [B]3.4.7[/B]
 Translations
 
@@ -40,6 +41,9 @@ Fix json problem with epg
 
 [B]3.4.0 - 3.4.1[/B]
 Try to fix compatibility with python 3
+
+[B]3.3.10[/B]
+Fix a json problem with epg
 
 [B]3.3.9[/B]
 Fix problem with RaiSport Keys- added a try-except to prevent key errors to block plugin to start 
