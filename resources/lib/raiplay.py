@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 try:
-  import urllib.request as urllib2
+    import urllib.request as urllib2
 except ImportError:
     import urllib2
 import json
 import re
 try:
-	import HTMLParser
+    import HTMLParser
 except ImportError:
-	import html.parser as HTMLParser
+    import html.parser as HTMLParser
 import xbmc
+import resources.lib.utils as utils
 
 class RaiPlay:
     # Raiplay android app
@@ -25,6 +26,7 @@ class RaiPlay:
     menuUrl = "http://www.rai.it/dl/RaiPlay/2016/menu/PublishingBlock-20b274b1-23ae-414f-b3bf-4bdc13b86af2.html?homejson"
     palinsestoUrl = "https://www.raiplay.it/palinsesto/app/old/[nomeCanale]/[dd-mm-yyyy].json"
     palinsestoUrlHtml = "https://www.raiplay.it/palinsesto/guidatv/lista/[idCanale]/[dd-mm-yyyy].html"
+    onAirUrl = "https://www.raiplay.it/palinsesto/onAir.json" 
     AzTvShowPath = "/dl/RaiTV/RaiPlayMobile/Prod/Config/programmiAZ-elenco.json"
     
     # Rai Sport urls
@@ -32,28 +34,41 @@ class RaiPlay:
     RaiSportLiveUrl= RaiSportMainUrl + '/dirette.html'
     RaiSportArchivioUrl = RaiSportMainUrl + '/archivio.html'        
     RaiSportSearchUrl = RaiSportMainUrl +  "/atomatic/news-search-service/api/v1/search?transform=false"
-
+    RaiPlayAddonHandle = None
     
-    def __init__(self):
+    def __init__(self, addonHandle):
         opener = urllib2.build_opener()
         # Set User-Agent
         opener.addheaders = [('User-Agent', self.UserAgent)]
         urllib2.install_opener(opener)
+        self.RaiPlayAddonHandle = addonHandle
         
     def getCountry(self):
         try:
-            response = urllib2.urlopen(self.localizeUrl).read()
+            response = utils.checkStr(urllib2.urlopen(self.localizeUrl).read())
         except urllib2.HTTPError:
             response = "ERROR"
         return response
         
     def getChannels(self):
-        response = json.load(urllib2.urlopen(self.channelsUrl))
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.channelsUrl).read()))
         return response["dirette"]
     
+    def getOnAir(self):
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.onAirUrl).read()))
+        return response["on_air"]
+    
+    def getHomePage(self):
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + 'index.json').read()))
+        return response["contents"]
+      
     def getRaiSportLivePage(self):
         chList = []
-        response = urllib2.urlopen(self.RaiSportLiveUrl).read()
+        try:
+            response = utils.checkStr(urllib2.urlopen(self.RaiSportLiveUrl).read())
+        except urllib2.HTTPError:
+            response = ''
+            
         m = re.search('<ul class="canali">(?P<list>.*)</ul>', response, re.S)
         if m:
             channels = re.findall ('<li>(.*?)</li>', m.group('list'), re.S)
@@ -70,7 +85,7 @@ class RaiPlay:
                     if title:
                         title = title.group('title')
                     else:
-                        title = 'Rai Sport Web Link'
+                        title = self.RaiPlayAddonHandle.getLocalizedString(32014)
                     chList.append({'title':title, 'url':url, 'icon':icon})
         
         return chList
@@ -79,7 +94,11 @@ class RaiPlay:
         # search for items in main menu
         RaiSportKeys=[]
         
-        data = urllib2.urlopen(self.RaiSportMainUrl).read()
+        try:        
+            data = utils.checkStr(urllib2.urlopen(self.RaiSportMainUrl).read())
+        except urllib2.HTTPError:
+            data = ''
+        
         m = re.search("<a href=\"javascript:void\(0\)\">Menu</a>(.*?)</div>", data,re.S)
         if not m: 
             return []
@@ -91,12 +110,15 @@ class RaiPlay:
             if ('/archivio.html?' in l[0]) and not ('&amp;' in l[0]):
                 good_links.append({'title': l[1], 'url' : l[0]})
         
-        good_links.append({'title': 'Altri sport', 'url' : '/archivio.html?tematica=altri-sport'})
+        good_links.append({'title': self.RaiPlayAddonHandle.getLocalizedString(32015), 'url' : '/archivio.html?tematica=altri-sport'})
         
         # open any single page in list and grab search keys
         
         for l in good_links:
-            data = urllib2.urlopen(self.RaiSportMainUrl + l['url']).read()
+            try:
+                data = utils.checkStr(urllib2.urlopen(self.RaiSportMainUrl + l['url']).read())
+            except urllib2.HTTPError:
+                data = ''
 
             dataDominio= re.findall("data-dominio=\"(.*?)\"", data)
             dataTematica = re.findall("data-tematica=\"(.*?)\"", data)
@@ -107,7 +129,7 @@ class RaiPlay:
         
                 try:
                     title=dataTematica[0].split('|')[0]
-                    title = HTMLParser.HTMLParser().unescape(title).encode('utf-8')
+                    title = utils.checkStr(HTMLParser.HTMLParser().unescape(title))
                     params={'title': title, 'dominio': dataDominio[0], 'sub_keys' : dataTematica}
                 
                     RaiSportKeys.append(params)
@@ -138,13 +160,17 @@ class RaiPlay:
             }
         }
         postData=json.dumps(payload)
-        req = urllib2.Request(self.RaiSportSearchUrl, postData, header)
+        try:
+            req = urllib2.Request(self.RaiSportSearchUrl, postData, header)
+            response = urllib2.urlopen(req)
+        except TypeError:
+            req = urllib2.Request(self.RaiSportSearchUrl, postData.encode('utf-8'), header)
+            response = urllib2.urlopen(req)
         
-        response = urllib2.urlopen(req)
         if response.code != 200:
             return []
         
-        data = response.read()
+        data = utils.checkStr(response.read())
         j = json.loads(data)
         
         if 'hits' in j:
@@ -186,7 +212,7 @@ class RaiPlay:
         url = self.palinsestoUrl
         url = url.replace("[nomeCanale]", channelTag)
         url = url.replace("[dd-mm-yyyy]", epgDate)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         try:
             key = channelName if channelName in response else ''
             oRetVal = response[key][0]["palinsesto"][0]["programmi"]
@@ -199,69 +225,86 @@ class RaiPlay:
         url = self.palinsestoUrlHtml
         url = url.replace("[idCanale]", channelTag)
         url = url.replace("[dd-mm-yyyy]", epgDate)
-        return urllib2.urlopen(url).read()
+        try:
+            data = utils.checkStr(urllib2.urlopen(url).read())
+        except urllib2.HTTPError:
+            data = ''
+        return data
         
     def getMainMenu(self):
-        response = json.load(urllib2.urlopen(self.menuUrl))
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.menuUrl).read()))
         return response["menu"]
 
     # RaiPlay Genere Page
     # RaiPlay Tipologia Page
     def getCategory(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
-        return response["contents"]
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response["contents"]
+        except: 
+            return []
   
     # Raiplay Tipologia Item
     def getProgrammeList(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
-        return response["contents"]
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response["contents"]
+        except:
+            return []
 
     # Raiplay AZ List
     def getProgrammeListOld(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
-        return response
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response
+        except:
+            return []
       
     #  PLR programma Page
     def getProgramme(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
-        return response
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response
+        except:
+            return[]
         
     def getContentSet(self, url):
         url = self.getUrl(url)
-        response = json.load(urllib2.urlopen(url))
-        return response["items"]
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response["items"]
+        except:
+            return []
     
     def getVideoMetadata(self, pathId):
         url = self.getUrl(pathId)
         if url.endswith(".html"):
             url = url.replace(".html",".json")
             
-        #data = urllib2.urlopen(url).read()
-
-        #s_name = re.findall("\"name\": \"(.*?)\",", data)
-        #for s in s_name:
-        #    data = data.replace(s , s.replace("\""," "))
-        #response = json.loads(data)
-
-        response = json.load(urllib2.urlopen(url))
-        
-        return response["video"]
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
+            return response["video"]
+        except:
+            return []
     
     def getIndexFromJSON(self, pathId):
         url = self.getUrl(pathId)
-        response = json.load(urllib2.urlopen(url))
+        try:
+            response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         
-        index = []
-        for i in response["contents"]:
-          if len(response["contents"][i])>0:
-            index.append(i)
+            index = []
+            for i in response["contents"]:
+              if len(response["contents"][i])>0:
+                index.append(i)
         
-        index.sort()
-        return index
+            index.sort()
+            return index
+        except:
+            return []
     
     def getUrl(self, pathId):
         url = pathId.replace(" ", "%20")

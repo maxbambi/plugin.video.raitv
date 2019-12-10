@@ -5,6 +5,7 @@ try:
   import urllib.request as urllib2
 except ImportError:
     import urllib2
+import resources.lib.utils as utils
 
 class Search:
     baseUrl = "http://www.rai.it"
@@ -32,7 +33,7 @@ class Search:
         
         url = self.baseUrl +  "/StatisticheProxy/proxyPost.jsp?action=getLastContentByTag&numContents=%s&tags=%s&domain=%s&xsl=%s" % \
               (str(numContents), tags, domain, xsl)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response["list"]
     
     def getMostVisited(self, tags, days=7, numContents=16):
@@ -43,5 +44,5 @@ class Search:
         
         url = self.baseUrl +  "/StatisticheProxy/proxyPost.jsp?action=mostVisited&days=%s&state=1&records=%s&tags=%s&domain=%s&xsl=%s" % \
             (str(days), str(numContents), tags, domain, xsl)
-        response = json.load(urllib2.urlopen(url))
+        response = json.loads(utils.checkStr(urllib2.urlopen(url).read()))
         return response["list"]

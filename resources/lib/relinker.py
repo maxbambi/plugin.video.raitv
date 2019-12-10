@@ -13,6 +13,8 @@ try:
 except:
     from urllib import urlencode
 
+import resources.lib.utils as utils
+    
 class Relinker:
     # Firefox 52 on Android
     # UserAgent = "Mozilla/5.0 (Android; Mobile; rv:52.0) Gecko/52.0 Firefox/52.0"
@@ -50,11 +52,16 @@ class Relinker:
         query = urlencode(qs, True)
         url = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
                 
-        response = urllib2.urlopen(url)
-        mediaUrl = response.read().strip()
-        
-        # Workaround to normalize URL if the relinker doesn't
-        try: mediaUrl = urllib.quote(mediaUrl, safe="%/:=&?~#+!$,;'@()*[]")
-        except: mediaUrl = urllib.parse.quote(mediaUrl, safe="%/:=&?~#+!$,;'@()*[]")
-        return mediaUrl
+        try:
+            response = utils.checkStr(urllib2.urlopen(url).read())
+            mediaUrl = response.strip()
 
+            # Workaround to normalize URL if the relinker doesn't
+            try: 
+                mediaUrl = urllib.quote(mediaUrl, safe="%/:=&?~#+!$,;'@()*[]")
+            except: 
+                mediaUrl = urllib.parse.quote(mediaUrl, safe="%/:=&?~#+!$,;'@()*[]")
+            return mediaUrl
+
+        except HTTPError:
+            return ''

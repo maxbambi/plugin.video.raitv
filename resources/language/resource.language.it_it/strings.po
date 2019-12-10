@@ -55,3 +55,23 @@ msgstr "Aree tematiche"
 msgctxt "#32010"
 msgid "Rai Sport Archive"
 msgstr "Archivio Rai Sport"
+
+msgctxt "#32011"
+msgid "Show all"
+msgstr "Tutti"
+
+msgctxt "#32012"
+msgid "Music and theater"
+msgstr "Musica e Teatro"
+
+msgctxt "#32013"
+msgid "Highlighted"
+msgstr "In evidenza"
+
+msgctxt "#32014"
+msgid "RaiSportWebLink"
+msgstr "Rai Sport Web Link"
+
+msgctxt "#32015"
+msgid "OtherSports"
+msgstr "Altri sport"

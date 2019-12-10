@@ -55,3 +55,23 @@ msgstr "Thematic areas"
 msgctxt "#32010"
 msgid "Rai Sport Archive"
 msgstr "Rai Sport Archive"
+
+msgctxt "#32011"
+msgid "Show all"
+msgstr "Show all"
+
+msgctxt "#32012"
+msgid "Music and theater"
+msgstr "Music and theater"
+
+msgctxt "#32013"
+msgid "Highlighted"
+msgstr "Highlighted"
+
+msgctxt "#32014"
+msgid "RaiSportWebLink"
+msgstr "Rai Sport Web Link"
+
+msgctxt "#32015"
+msgid "OtherSports"
+msgstr "Other sports"
