@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
+import sys
 import json
 import urllib
-try:
-  import urllib.request as urllib2
-except ImportError:
-    import urllib2
 import resources.lib.utils as utils
+
+PY3 = sys.version_info.major >= 3
+
+if PY3:
+    import urllib.request as urllib2
+
+else:
+    import urllib2
+
 
 class Search:
     baseUrl = "http://www.rai.it"

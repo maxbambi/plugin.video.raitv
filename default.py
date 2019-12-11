@@ -8,14 +8,20 @@ import xbmcaddon
 import urllib
 import json
 
-try:
+PY3 = sys.version_info.major >= 3
+
+if PY3:
+    import urllib.request as urllib2
+    import html.parser as HTMLParser
     import urllib.parse as urlparse
-except ImportError:
-    import urlparse
-try:
     from urllib.parse import urlencode
-except:
+    
+else:
+    import urllib2
+    import HTMLParser
+    import urlparse
     from urllib import urlencode
+    
 import datetime
 
 import StorageServer
@@ -27,10 +33,6 @@ from resources.lib.raiplayradio import RaiPlayRadio
 from resources.lib.relinker import Relinker
 import resources.lib.utils as utils
 import re
-try:
-    import HTMLParser
-except:
-    import html.parser as HTMLParser
 
 # plugin constants
 __plugin__ = "plugin.video.raitv"

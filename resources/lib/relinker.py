@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
+import sys
 import urllib
-try:
-  import urllib.request as urllib2
-except ImportError:
-    import urllib2
-try:
-  import urllib.parse as urlparse
-except ImportError:
-    import urlparse
-try:
+import resources.lib.utils as utils
+
+PY3 = sys.version_info.major >= 3
+
+if PY3:
+    import urllib.request as urllib2
+    import urllib.parse as urlparse
     from urllib.parse import urlencode
-except:
+
+else:
+    import urllib2
+    import urlparse
     from urllib import urlencode
 
-import resources.lib.utils as utils
     
 class Relinker:
     # Firefox 52 on Android
