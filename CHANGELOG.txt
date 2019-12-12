@@ -1,0 +1,54 @@
+[B]3.4.8[/B]
+Changes requested by Official Kodi Repo
+
+[B]3.4.7[/B]
+Translations
+
+[B]3.4.6[/B]
+Added new items for viewing all elements of a category.
+On air menu shows also current programs. 
+
+[B]3.4.3-.5[/B]
+Added new section from home page of Raiplay.
+Using updated library 'script.common.plugin.cache'. 
+You can download it from https://github.com/anxdpanic/script.common.plugin.cache  
+
+[B]3.4.2[/B]
+Fix json problem with epg 
+
+[B]3.4.0 - 3.4.1[/B]
+Try to fix compatibility with python 3
+
+[B]3.3.9[/B]
+Fix problem with RaiSport Keys- added a try-except to prevent key errors to block plugin to start 
+
+[B]3.3.8[/B]
+Fix Radio Channels - Live and EPG
+
+[B]3.3.6[/B]
+Back to script.common.plugin.cache
+
+[B]3.3.0 - 3.3.5[/B]
+Fixes for new raiplay
+
+[B]3.2.2[/B]
+Big merge
+
+[B]3.2.1[/B]
+- fix a stupid error of delimiters in json
+
+[B]3.2.0[/B]
+
+- add Rai Sport Video section
+
+[B]3.1.1[/B]
+- add Rai sport web streams 
+
+[B]3.1.0[/B]
+- New epg source: 
+https://www.raiplay.it/palinsesto/guidatv/lista/
+
+[B]3.0.0[/B]
+- from https://github.com/cttynul/plugin.video.raitv 
+Storage Server used is a fork of Common Plugin Cache, edited to make it works with Python 3
+

@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
-try:
-    import urllib.request as urllib2
-except ImportError:
-    import urllib2
+import sys
 import json
 import re
-try:
-    import HTMLParser
-except ImportError:
-    import html.parser as HTMLParser
 import xbmc
 import resources.lib.utils as utils
+
+PY3 = sys.version_info.major >= 3
+
+if PY3:
+    import urllib.request as urllib2
+    import html.parser as HTMLParser
+
+else:
+    import urllib2
+    import HTMLParser
+
 
 class RaiPlay:
     # Raiplay android app
