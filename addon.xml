@@ -30,6 +30,9 @@ Source: https://github.com/maxbambi/plugin.video.raitv/
     <email></email>
     <news>
 [B]3.4.8[/B]
+- Updated User-Agent
+- Plugin can stream mpd  
+[B]3.4.7[/B]
 - Translations
 - Added new items for viewing all elements of a category.
 - On air menu shows also current programs. 

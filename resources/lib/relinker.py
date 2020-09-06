@@ -24,9 +24,9 @@ class Relinker:
     # Firefox 52 ESR on Linux
     # UserAgent = "Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0"
     # Chrome 64 on Windows 10
-    # UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282 Safari/537.36"
+    UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36"
     # Raiplay android app
-    UserAgent = "Android 4.2.2 (smart) / RaiPlay 2.1.3 / WiFi"
+    #UserAgent = "Android 4.2.2 (smart) / RaiPlay 2.1.3 / WiFi"
     
     def __init__(self):
         opener = urllib2.build_opener()
