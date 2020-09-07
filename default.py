@@ -145,6 +145,8 @@ def show_tgr_list(mode, url):
 def play(url, pathId="", srt=[]):
     xbmc.log("Playing...")
     
+    ct = ""
+    key = ""
     if pathId != "":
         xbmc.log("PathID: " + pathId)
 
@@ -156,7 +158,6 @@ def play(url, pathId="", srt=[]):
             srtUrl = ""
         else:
             raiplay = RaiPlay(Addon)
-            xbmc.log("Url: " + raiplay.getUrl(pathId))
             metadata = raiplay.getVideoMetadata(pathId)
             url = metadata["content_url"]
             srtUrl = metadata["subtitles"]
