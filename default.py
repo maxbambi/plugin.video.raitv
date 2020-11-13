@@ -166,10 +166,7 @@ def play(url, pathId="", srt=[]):
             xbmc.log("SRT URL: " + srtUrl)
             srt.append(srtUrl)
 
-    # Handle RAI relinker
-    if url[:53] == "http://mediapolis.rai.it/relinker/relinkerServlet.htm" or \
-        url[:56] == "http://mediapolisvod.rai.it/relinker/relinkerServlet.htm" or \
-        url[:58] == "http://mediapolisevent.rai.it/relinker/relinkerServlet.htm":
+    if "relinkerServlet" in url:
         xbmc.log("Relinker URL: " + url)
         relinker = Relinker()
         params = relinker.getURL(url)

@@ -1,3 +1,6 @@
+[B]3.5.0.2[/B]
+- 3.5.0.2 fix play and relinker
+
 [B]3.5.0.1[/B]
 - 3.5.0.1 fix live stream
 
