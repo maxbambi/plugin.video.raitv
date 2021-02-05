@@ -1,3 +1,6 @@
+[B]3.5.1[/B]
+- 3.5.1 fix url for VOD
+
 [B]3.5.0.2[/B]
 - 3.5.0.2 fix play and relinker
 
