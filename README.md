@@ -1,8 +1,7 @@
 # plugin.video.raitv
-Kodi plugin for RAI
 
 Kodi 18:
-use 'master' branch
+use 'master' branch:
 https://github.com/maxbambi/plugin.video.raitv/archive/master.zip
 
 Kodi 19:
