@@ -143,6 +143,7 @@ def show_tgr_list(mode, url):
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def play(url, pathId="", srt=[]):
+    KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
     xbmc.log("Playing...")
     
     ct = ""
@@ -189,7 +190,11 @@ def play(url, pathId="", srt=[]):
         item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
     
     if "dash" in ct :
-        item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+        if KODI_VERSION_MAJOR >= 19:
+            item.setProperty('inputstream', 'inputstream.adaptive')
+        else:
+            item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+
         item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         item.setMimeType('application/dash+xml')
         if key:
