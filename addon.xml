@@ -4,9 +4,9 @@
        version="3.6.0"
        provider-name="Nightflyer, cttynul, maxbambi, fabpolli">
   <requires>
-	<import addon="xbmc.python" version="3.0.0"/>    
-	<import addon="script.common.plugin.cache" version="2.6.0"/>
-    	<import addon="script.module.inputstreamhelper"/>
+        <import addon="xbmc.python" version="3.0.0"/>    
+        <import addon="script.common.plugin.cache" version="2.6.0"/>
+        <import addon="script.module.inputstreamhelper"/>
   </requires>
   <extension point="xbmc.python.pluginsource"
             library="default.py">
