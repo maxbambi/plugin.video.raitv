@@ -124,7 +124,7 @@ class RaiPlay:
         for l in good_links:
             try:
                 data = utils.checkStr(urllib2.urlopen(self.RaiSportMainUrl + l['url']).read())
-            except urllib2.HTTPError:
+            except:
                 data = ''
 
             dataDominio= re.findall("data-dominio=\"(.*?)\"", data)
