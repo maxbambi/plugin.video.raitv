@@ -36,7 +36,7 @@ class TGR:
 
             return programmes
         
-        except :
+        except:
             return []
      
     def getList(self, url):
@@ -66,6 +66,6 @@ class TGR:
 
             return items
 
-        except :
+        except:
             return []
         
