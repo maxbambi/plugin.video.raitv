@@ -342,3 +342,20 @@ class RaiPlay:
             url = url.replace("[RESOLUTION]", "256x-")
         return url
  
+    def getThumbnailUrl2(self, item):
+        if "images" in item:
+            if "landscape" in item["images"]:
+                url = item["images"]["landscape"]
+                return self.getThumbnailUrl(url)
+            elif "landscape43" in item["images"]:
+                url = item["images"]["landscape43"]
+                return self.getThumbnailUrl(url)
+            elif "portrait" in item["images"]:
+                url = item["images"]["portrait"]
+                return self.getThumbnailUrl(url)
+            elif "portrait43" in item["images"]:
+                url = item["images"]["portrait43"]
+                return self.getThumbnailUrl(url)
+                
+        return self.noThumbUrl
+        

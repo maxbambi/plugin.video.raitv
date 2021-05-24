@@ -263,7 +263,7 @@ def show_home():
             for item2 in item["contents"]:
                 sub_type = item2["type"]
                 liStyle = xbmcgui.ListItem("%s: %s" % (Addon.getLocalizedString(32013), item2['name']))
-                liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item2["images"]["landscape"])})
+                liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(item2)})
 
                 if sub_type == "RaiPlay Diretta Item":
                     liStyle.setInfo("video", {})
@@ -295,7 +295,7 @@ def show_home():
             # populate subItems array
             subItems=[]
             for item2 in item["contents"]:
-                subItems.append({"mode": "ondemand", "name": item2["name"], "path_id": item2["path_id"], "video_url": item2.get("video_url",""), "sub_type": item2["type"], "icon": raiplay.getThumbnailUrl(item2["images"]["landscape"])})
+                subItems.append({"mode": "ondemand", "name": item2["name"], "path_id": item2["path_id"], "video_url": item2.get("video_url",""), "sub_type": item2["type"], "icon": raiplay.getThumbnailUrl2(item2)})
                 
             liStyle = xbmcgui.ListItem(item['name'])
             addDirectoryItem({"mode": "ondemand_slider", "sub_items": json.dumps(subItems)}, liStyle)
@@ -311,7 +311,7 @@ def show_collection(pathId):
 
     for item in response:
         liStyle = xbmcgui.ListItem(item["name"])
-        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
+        liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(item)})
         addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": item["type"]}, liStyle)
     
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
@@ -388,10 +388,10 @@ def show_replay_tv_epg(date, channelId):
             startTime = programme["timePublished"]
             title = programme["name"].replace("\n"," ")
 
-            if programme["images"]["landscape"] != "":
-                thumb = raiplay.getThumbnailUrl(programme["images"]["landscape"])
-            elif programme["isPartOf"] and programme["isPartOf"]["images"]["landscape"] != "":
-                thumb = raiplay.getThumbnailUrl(programme["isPartOf"]["images"]["landscape"])
+            if programme["images"]:
+                thumb = raiplay.getThumbnailUrl2(programme)
+            elif programme["isPartOf"] :
+                thumb = raiplay.getThumbnailUrl2(programme["isPartOf"])
             else:
                 thumb = raiplay.noThumbUrl
 
@@ -561,7 +561,7 @@ def show_ondemand_index(index, pathId):
     dir = raiplay.getProgrammeList(pathId)
     for item in dir[index]:
         liStyle = xbmcgui.ListItem(item["name"])
-        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
+        liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(item)})
         addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": item["type"]}, liStyle)
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
@@ -574,7 +574,7 @@ def show_ondemand_index_all(index, pathId):
     for currKey in dictKeys:
         for item in dir[currKey]:
             liStyle = xbmcgui.ListItem(item["name"])
-            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
+            liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(item)})
             addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": item["type"]}, liStyle)
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
@@ -590,7 +590,7 @@ def show_ondemand_programme(pathId):
         # it's a movie
         if "first_item_path" in programme: 
             liStyle = xbmcgui.ListItem(programme["program_info"]["name"])
-            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(programme["program_info"]["images"]["landscape"])})
+            liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(programme["program_info"])})
             liStyle.setInfo("video", {
                 "Plot": programme["program_info"]["description"],
                 "Cast": programme["program_info"]["actors"].split(", "),
@@ -618,7 +618,7 @@ def show_ondemand_items(url):
         if "subtitle" in item and item["subtitle"] != "" and item["subtitle"] != item["name"]:
             title = title + " (" + item["subtitle"] + ")"
         liStyle = xbmcgui.ListItem(title)
-        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
+        liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(item)})
         liStyle.setInfo("video", {})
         addLinkItem({"mode": "play", "path_id": item["path_id"]}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
@@ -638,13 +638,14 @@ def search_ondemand_programmes():
             for item in dir[letter]:
                 if item["name"].lower().find(name) != -1:
                     #fix old version of url
-                    url = item["PathID"]
-                    if url.endswith('/?json'):
-                        url = url.replace('/?json', '.json')
-                    
-                    liStyle = xbmcgui.ListItem(item["name"])
-                    liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["images"]["landscape"])})
-                    addDirectoryItem({"mode": "ondemand", "path_id": url , "sub_type": "PLR programma Page"}, liStyle)
+                    if "PathID" in item:
+                        url = item["PathID"]
+                        if url.endswith('/?json'):
+                            url = url.replace('/?json', '.json')
+                        
+                        liStyle = xbmcgui.ListItem(item["name"])
+                        liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(item)})
+                        addDirectoryItem({"mode": "ondemand", "path_id": url , "sub_type": "PLR programma Page"}, liStyle)
         xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
         xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
