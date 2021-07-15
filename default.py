@@ -197,7 +197,7 @@ def play(url, pathId="", srt=[]):
         item.setMimeType('application/dash+xml')
         if key:
             item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
-            item.setProperty("inputstream.adaptive.license_key",  key + '||R{SSM}|')
+            item.setProperty("inputstream.adaptive.license_key",  key + "||R{SSM}|")
     
     if len(srt) > 0:
         item.setSubtitles(srt)
