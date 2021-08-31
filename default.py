@@ -620,7 +620,13 @@ def show_ondemand_items(url):
             title = title + " (" + item["subtitle"] + ")"
         liStyle = xbmcgui.ListItem(title)
         liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(item)})
-        liStyle.setInfo("video", {})
+        liStyle.setInfo("video", {
+            "tvshowtitle": item["program_name"],
+            "title": item["episode_title"],
+            "season": item["season"],
+            "episode": item["episode"],
+            "Plot": item["description"],
+            })
         addLinkItem({"mode": "play", "path_id": item["path_id"]}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
