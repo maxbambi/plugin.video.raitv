@@ -594,8 +594,8 @@ def show_ondemand_programme(pathId):
             liStyle.setInfo("video", {
                 "Plot": programme["program_info"]["description"],
                 "Cast": programme["program_info"]["actors"].split(", "),
-                "Director": programme["program_info"]["direction"],
-                "Country": programme["program_info"]["country"],
+                "Director": programme["program_info"]["direction"].split(", "),
+                "Country": programme["program_info"]["country"].split(", "),
                 "Year": programme["program_info"]["year"],
                 })
             addLinkItem({"mode": "play", "path_id": programme["first_item_path"]}, liStyle)
