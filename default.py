@@ -605,7 +605,16 @@ def show_ondemand_programme(pathId):
         for block in blocks:
             for set in block["sets"]:
                 label = '%s (%s)' % (set["name"], block["name"]) if set["name"] != block["name"] else set["name"]
+                try:
+                    season = re.search('Stagione (\\d+)', set["name"]).group(1)
+                except:
+                    season = 1
                 liStyle = xbmcgui.ListItem(label)
+                liStyle.setInfo("video", {
+                    "showtitle": programme["program_info"]["name"],
+                    "Year": programme["program_info"]["year"],
+                    "season": season,
+                    })
                 addDirectoryItem({"mode": "ondemand_items", "url": set["path_id"]}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
