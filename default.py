@@ -604,7 +604,8 @@ def show_ondemand_programme(pathId):
         blocks = programme["blocks"]
         for block in blocks:
             for set in block["sets"]:
-                liStyle = xbmcgui.ListItem(set["name"])
+                label = '%s (%s)' % (set["name"], block["name"]) if set["name"] != block["name"] else set["name"]
+                liStyle = xbmcgui.ListItem(label)
                 addDirectoryItem({"mode": "ondemand_items", "url": set["path_id"]}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
