@@ -594,8 +594,8 @@ def show_ondemand_programme(pathId):
             liStyle.setInfo("video", {
                 "Plot": programme["program_info"]["description"],
                 "Cast": programme["program_info"]["actors"].split(", "),
-                "Director": programme["program_info"]["direction"],
-                "Country": programme["program_info"]["country"],
+                "Director": programme["program_info"]["direction"].split(", "),
+                "Country": programme["program_info"]["country"].split(", "),
                 "Year": programme["program_info"]["year"],
                 })
             addLinkItem({"mode": "play", "path_id": programme["first_item_path"]}, liStyle)
@@ -604,7 +604,17 @@ def show_ondemand_programme(pathId):
         blocks = programme["blocks"]
         for block in blocks:
             for set in block["sets"]:
-                liStyle = xbmcgui.ListItem(set["name"])
+                label = '%s (%s)' % (set["name"], block["name"]) if set["name"] != block["name"] else set["name"]
+                try:
+                    season = re.search('Stagione (\\d+)', set["name"]).group(1)
+                except:
+                    season = 1
+                liStyle = xbmcgui.ListItem(label)
+                liStyle.setInfo("video", {
+                    "showtitle": programme["program_info"]["name"],
+                    "Year": programme["program_info"]["year"],
+                    "season": season,
+                    })
                 addDirectoryItem({"mode": "ondemand_items", "url": set["path_id"]}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
@@ -619,7 +629,13 @@ def show_ondemand_items(url):
             title = title + " (" + item["subtitle"] + ")"
         liStyle = xbmcgui.ListItem(title)
         liStyle.setArt({"thumb": raiplay.getThumbnailUrl2(item)})
-        liStyle.setInfo("video", {})
+        liStyle.setInfo("video", {
+            "tvshowtitle": item["program_name"],
+            "title": item["episode_title"],
+            "season": item["season"],
+            "episode": item["episode"],
+            "Plot": item["description"],
+            })
         addLinkItem({"mode": "play", "path_id": item["path_id"]}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
