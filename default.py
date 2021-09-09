@@ -611,7 +611,7 @@ def show_ondemand_programme(pathId):
                     season = 1
                 liStyle = xbmcgui.ListItem(label)
                 liStyle.setInfo("video", {
-                    "showtitle": programme["program_info"]["name"],
+                    "tvshowtitle": programme["program_info"]["name"],
                     "Year": programme["program_info"]["year"],
                     "season": season,
                     })
