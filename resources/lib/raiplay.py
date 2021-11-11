@@ -38,7 +38,6 @@ class RaiPlay:
     
     # Rai Sport urls
     RaiSportMainUrl = 'https://www.raisport.rai.it'
-    RaiSportLiveUrl= RaiSportMainUrl + '/dirette.html'
     RaiSportArchivioUrl = RaiSportMainUrl + '/archivio.html'        
     RaiSportSearchUrl = RaiSportMainUrl +  "/atomatic/news-search-service/api/v1/search?transform=false"
     RaiPlayAddonHandle = None
@@ -53,7 +52,7 @@ class RaiPlay:
     def getCountry(self):
         try:
             response = utils.checkStr(urllib2.urlopen(self.localizeUrl).read())
-        except urllib2.HTTPError:
+        except :
             response = "ERROR"
         return response
         
@@ -71,29 +70,9 @@ class RaiPlay:
       
     def getRaiSportLivePage(self):
         chList = []
-        try:
-            response = utils.checkStr(urllib2.urlopen(self.RaiSportLiveUrl).read())
-        except urllib2.HTTPError:
-            response = ''
-            
-        m = re.search('<ul class="canali">(?P<list>.*)</ul>', response, re.S)
-        if m:
-            channels = re.findall ('<li>(.*?)</li>', m.group('list'), re.S)
-            for ch in channels:
-                url = re.search('''data-video-url=['"](?P<url>[^'^"]+)['"]''', ch)
-                if url:
-                    url = url.group('url')
-                    icon = re.search('''stillframe=['"](?P<url>[^'^"]+)['"]''', ch )
-                    if icon:
-                        icon = self.getUrl(icon.group('url'))
-                    else:
-                        icon = ''
-                    title = re.search(">(?P<title>[^<]+)</a>", ch )
-                    if title:
-                        title = title.group('title')
-                    else:
-                        title = self.RaiPlayAddonHandle.getLocalizedString(32014)
-                    chList.append({'title':title, 'url':url, 'icon':icon})
+
+        chList.append({'title':'RaiSport Web 1', 'url': 'https://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=22590', 'icon':''})
+        chList.append({'title':'RaiSport Web 2', 'url': 'https://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=35259', 'icon':''})
         
         return chList
     
@@ -103,7 +82,7 @@ class RaiPlay:
         
         try:        
             data = utils.checkStr(urllib2.urlopen(self.RaiSportMainUrl).read())
-        except urllib2.HTTPError:
+        except :
             data = ''
         
         m = re.search("<a href=\"javascript:void\(0\)\">Menu</a>(.*?)</div>", data,re.S)
@@ -124,7 +103,7 @@ class RaiPlay:
         for l in good_links:
             try:
                 data = utils.checkStr(urllib2.urlopen(self.RaiSportMainUrl + l['url']).read())
-            except urllib2.HTTPError:
+            except:
                 data = ''
 
             dataDominio= re.findall("data-dominio=\"(.*?)\"", data)
@@ -234,7 +213,7 @@ class RaiPlay:
         url = url.replace("[dd-mm-yyyy]", epgDate)
         try:
             data = utils.checkStr(urllib2.urlopen(url).read())
-        except urllib2.HTTPError:
+        except :
             data = ''
         return data
         
@@ -342,3 +321,20 @@ class RaiPlay:
             url = url.replace("[RESOLUTION]", "256x-")
         return url
  
+    def getThumbnailUrl2(self, item):
+        if "images" in item:
+            if "landscape" in item["images"]:
+                url = item["images"]["landscape"]
+                return self.getThumbnailUrl(url)
+            elif "landscape43" in item["images"]:
+                url = item["images"]["landscape43"]
+                return self.getThumbnailUrl(url)
+            elif "portrait" in item["images"]:
+                url = item["images"]["portrait"]
+                return self.getThumbnailUrl(url)
+            elif "portrait43" in item["images"]:
+                url = item["images"]["portrait43"]
+                return self.getThumbnailUrl(url)
+                
+        return self.noThumbUrl
+        

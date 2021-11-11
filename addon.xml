@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.raitv"
        name="Rai Play"
-       version="3.5.1"
+       version="3.7.0"
        provider-name="Nightflyer, cttynul, maxbambi, fabpolli">
   <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-    <import addon="script.common.plugin.cache" version="2.6.0"/>
-    <import addon="script.module.inputstreamhelper"/>
+        <import addon="xbmc.python" version="3.0.0"/>    
+        <import addon="script.common.plugin.cache" version="2.6.0"/>
+        <import addon="script.module.inputstreamhelper"/>
   </requires>
   <extension point="xbmc.python.pluginsource"
             library="default.py">
@@ -30,18 +30,20 @@ Source: https://github.com/maxbambi/plugin.video.raitv/
     <website>https://github.com/maxbambi/plugin.video.raitv/</website>
     <email></email>
     <news>
-[B]3.5.1[/B]
-- Fix new urls for VOD   
-[B]3.5.0[/B]
-- Plugin works with Widevine DRM  
-[B]3.4.8[/B]
-- Updated User-Agent
-- Plugin can stream mpd  
-[B]3.4.7[/B]
-- Translations
-- Added new items for viewing all elements of a category.
-- On air menu shows also current programs. 
-- Added new section from home page of Raiplay.
+[B]3.7.0[/B]
+- Various visual improvements 
+
+[B]3.6.2[/B]
+- Raisport Web channels  
+
+[B]3.6.1[/B]
+- fix news section
+
+[B]3.6.0.2[/B]
+- fix in try except  
+
+[B]3.6.0[/B]
+- Fixes for Kodi 19 Matrix  
     </news>
     <source>https://github.com/maxbambi/plugin.video.raitv/</source>
     <assets>

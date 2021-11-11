@@ -1,3 +1,18 @@
+[B]3.7.0[/B]
+- Various visual improvements 
+
+[B]3.6.2[/B]
+- Raisport Web channels  
+
+[B]3.6.1[/B]
+- fix news section
+
+[B]3.6.0.2[/B]
+- fix in try except  
+
+[B]3.6.0[/B]
+- Fixes for Kodi 19 Matrix  
+
 [B]3.5.1[/B]
 - 3.5.1 fix url for VOD
 
