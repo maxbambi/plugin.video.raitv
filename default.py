@@ -159,7 +159,7 @@ def play(url, pathId="", srt=[]):
             raiplay = RaiPlay(Addon)
             metadata = raiplay.getVideoMetadata(pathId)
             url = metadata["content_url"]
-            srt = [sub['url'] for sub in metadata.get("subtitlesArray", [])]
+            srt = [raiplay.baseUrl[:-1] + sub['url'] for sub in metadata.get("subtitlesArray", [])]
 
         if srt:
             xbmc.log("SRT URL: {}".format(srt))
