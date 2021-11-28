@@ -53,7 +53,7 @@ class RaiPlay:
     def getCountry(self):
         try:
             response = utils.checkStr(urllib2.urlopen(self.localizeUrl).read())
-        except urllib2.HTTPError:
+        except :
             response = "ERROR"
         return response
         
@@ -73,7 +73,7 @@ class RaiPlay:
         chList = []
         try:
             response = utils.checkStr(urllib2.urlopen(self.RaiSportLiveUrl).read())
-        except urllib2.HTTPError:
+        except :
             response = ''
             
         m = re.search('<ul class="canali">(?P<list>.*)</ul>', response, re.S)
