@@ -1,3 +1,6 @@
+[B]3.7.1[/B]
+- Fix Subtitles 
+
 [B]3.7.0[/B]
 - Various visual improvements 
 
