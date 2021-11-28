@@ -154,16 +154,14 @@ def play(url, pathId="", srt=[]):
             raiplayradio = RaiPlayRadio()
             metadata = raiplayradio.getAudioMetadata(pathId)
             url = metadata["contentUrl"]
-            srtUrl = ""
         else:
             raiplay = RaiPlay(Addon)
             metadata = raiplay.getVideoMetadata(pathId)
             url = metadata["content_url"]
-            srtUrl = metadata["subtitles"]
-            
-        if srtUrl != "":
-            xbmc.log("SRT URL: " + srtUrl)
-            srt.append(srtUrl)
+            srt = [raiplay.baseUrl[:-1] + sub['url'] for sub in metadata.get("subtitlesArray", [])]
+
+        if srt:
+            xbmc.log("SRT URL: {}".format(srt))
 
     if "relinkerServlet" in url:
         url = url.replace ("https:", "http:")
@@ -199,7 +197,7 @@ def play(url, pathId="", srt=[]):
             item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
             item.setProperty("inputstream.adaptive.license_key",  key + "||R{SSM}|")
     
-    if len(srt) > 0:
+    if srt:
         item.setSubtitles(srt)
     xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
 
