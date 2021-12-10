@@ -1,3 +1,6 @@
+[B]3.6.0[/B]
+- 3.6.0 fix Radio Rai streams
+
 [B]3.5.1[/B]
 - 3.5.2 fix subtitles
 
