@@ -237,13 +237,14 @@ def show_tv_channels():
 
 def show_radio_stations():
     for station in radio_stations:
-        liStyle = xbmcgui.ListItem(station["channel"])
-        liStyle.setArt({"thumb": station["stillFrame"]})
+        ch = station["channel"]
+        liStyle = xbmcgui.ListItem(ch["name"])
+        liStyle.setArt({"thumb": "http://rai.it" + station["images"]["square"]})
         liStyle.setInfo("music", {})
         if 'contentUrl' in station['audio']:
             addLinkItem({"mode": "play", "url": station["audio"]["contentUrl"]}, liStyle)
         else:
-            addLinkItem({"mode": "play", "url": station["audio"]["castUrl"]}, liStyle)
+            addLinkItem({"mode": "play", "url": station["audio"]["url"]}, liStyle)
         
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
