@@ -364,12 +364,13 @@ def show_replay_tv_channels(date):
 def show_replay_radio_channels(date):
     for station in radio_stations:
         ch = station["channel"]
-        liStyle = xbmcgui.ListItem(ch["channel"])
+        liStyle = xbmcgui.ListItem(ch["name"])
         liStyle.setArt({"thumb": "http://rai.it" + station["images"]["square"]})
         addDirectoryItem({"mode": "replay",
             "media": "radio",
-            "channel_id": ch["name"].encode("utf-8"),
+            "channel_id": ch["name"],
             "date": date}, liStyle)
+            
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 
