@@ -154,14 +154,16 @@ def play(url, pathId="", srt=[]):
             raiplayradio = RaiPlayRadio()
             metadata = raiplayradio.getAudioMetadata(pathId)
             url = metadata["contentUrl"]
+            srtUrl = ""
         else:
             raiplay = RaiPlay(Addon)
             metadata = raiplay.getVideoMetadata(pathId)
             url = metadata["content_url"]
-            srt = [raiplay.baseUrl[:-1] + sub['url'] for sub in metadata.get("subtitlesArray", [])]
-
-        if srt:
-            xbmc.log("SRT URL: {}".format(srt))
+            srtUrl = metadata["subtitles"]
+            
+        if srtUrl != "":
+            xbmc.log("SRT URL: " + srtUrl)
+            srt.append(srtUrl)
 
     if "relinkerServlet" in url:
         url = url.replace ("https:", "http:")
@@ -197,7 +199,7 @@ def play(url, pathId="", srt=[]):
             item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
             item.setProperty("inputstream.adaptive.license_key",  key + "||R{SSM}|")
     
-    if srt:
+    if len(srt) > 0:
         item.setSubtitles(srt)
     xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
 
@@ -240,13 +242,14 @@ def show_tv_channels():
 
 def show_radio_stations():
     for station in radio_stations:
-        liStyle = xbmcgui.ListItem(station["channel"])
-        liStyle.setArt({"thumb": station["stillFrame"]})
+        ch = station["channel"]
+        liStyle = xbmcgui.ListItem(ch["name"])
+        liStyle.setArt({"thumb": "http://rai.it" + station["images"]["square"]})
         liStyle.setInfo("music", {})
         if 'contentUrl' in station['audio']:
             addLinkItem({"mode": "play", "url": station["audio"]["contentUrl"]}, liStyle)
         else:
-            addLinkItem({"mode": "play", "url": station["audio"]["castUrl"]}, liStyle)
+            addLinkItem({"mode": "play", "url": station["audio"]["url"]}, liStyle)
         
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
@@ -609,7 +612,7 @@ def show_ondemand_programme(pathId):
                     season = 1
                 liStyle = xbmcgui.ListItem(label)
                 liStyle.setInfo("video", {
-                    "tvshowtitle": programme["program_info"]["name"],
+                    "showtitle": programme["program_info"]["name"],
                     "Year": programme["program_info"]["year"],
                     "season": season,
                     })
