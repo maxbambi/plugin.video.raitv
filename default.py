@@ -251,9 +251,9 @@ def show_radio_stations():
         
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
-def show_home():
+def show_home(defaultUrl="index.json"):
     raiplay = RaiPlay(Addon)
-    response = raiplay.getHomePage()
+    response = raiplay.getHomePage(defaultUrl)
     
     for item in response:
         item_type = item.get("type","")
@@ -324,10 +324,16 @@ def show_slider_items(subItems):
         liStyle = xbmcgui.ListItem(item.get("name",""))
         liStyle.setArt({"thumb": item["icon"]})
         if item.get("sub_type","") == "RaiPlay Video Item":
+            xbmc.log("Link: " + item.get("name","") + " " + item["video_url"])
             liStyle.setInfo("video", {})
             addLinkItem({"mode": "play", "url": item["video_url"]}, liStyle)
         else:
-            addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": item["sub_type"]}, liStyle)
+            pathId = item["path_id"]
+            xbmc.log("Directory: " + item.get("name","") + " " + pathId)
+            if "tipologia/" in pathId:
+                addDirectoryItem({"mode": "ondemand_subhome", "path_id": pathId}, liStyle)
+            else:
+                addDirectoryItem({"mode": "ondemand", "path_id": item["path_id"], "sub_type": item["sub_type"]}, liStyle)
     
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
         
@@ -793,7 +799,7 @@ elif mode == "live_radio":
     show_radio_stations()
 
 elif mode == "home":
-    show_home()
+    show_home("index.json")
     
 elif mode == "replay":
     if date == "":
@@ -837,6 +843,8 @@ elif mode == "ondemand_collection":
 elif mode == "ondemand_slider":
     subItems = params.get("sub_items", [])
     show_slider_items(subItems)
+elif mode == "ondemand_subhome":
+    show_home(pathId)
 
 elif mode == "tg":
     show_tg_root()
