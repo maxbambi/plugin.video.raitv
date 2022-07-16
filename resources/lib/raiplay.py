@@ -64,8 +64,8 @@ class RaiPlay:
         response = json.loads(utils.checkStr(urllib2.urlopen(self.onAirUrl).read()))
         return response["on_air"]
     
-    def getHomePage(self):
-        response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + 'index.json').read()))
+    def getHomePage(self, defaultUrl):
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + defaultUrl).read()))
         return response["contents"]
       
     def getRaiSportLivePage(self):
