@@ -209,7 +209,7 @@ def show_tv_channels():
     
     for station in tv_stations:
         chName = station["channel"]
-        current = ""
+        current = thumb = ""
         for d in onAirJson:
             if chName == d["channel"]:
                 current = d["currentItem"].get("name","")
