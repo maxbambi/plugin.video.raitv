@@ -1,3 +1,12 @@
+[B]3.8.3[/B]
+- Fix error: local variable 'thumb' referenced before assignment
+
+[B]3.8.2[/B]
+- Fix Home Page Raiplay  
+
+[B]3.8.1[/B]
+- Fix Home Page Raiplay  
+
 [B]3.8.0[/B]
 - Fix Radio Rai Audio Streams  
 
