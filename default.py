@@ -511,9 +511,12 @@ def show_ondemand_root():
                 # i.e. change "/raiplay/programmi/?json" to "/raiplay/tipologia/programmi/index.json"
                 m = re.findall("raiplay/(.*?)/[?]json", item["PathID"])
                 if m:
+                    if m[0]=="fiction":
+                        m[0]="serieitaliane"
+                    
                     item["PathID"] = "/raiplay/tipologia/%s/index.json" % m[0]   
 
-                addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
+                    addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
     
     # add new item not in old json
     liStyle = xbmcgui.ListItem(Addon.getLocalizedString(32012))

@@ -1,3 +1,6 @@
+[B]3.9.0[/B]
+- Fix Fiction menu empty
+
 [B]3.8.3[/B]
 - Fix error: local variable 'thumb' referenced before assignment
 
