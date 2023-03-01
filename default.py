@@ -512,21 +512,39 @@ def show_ondemand_root():
                 # i.e. change "/raiplay/programmi/?json" to "/raiplay/tipologia/programmi/index.json"
                 m = re.findall("raiplay/(.*?)/[?]json", item["PathID"])
                 if m:
+                    
                     if m[0]=="fiction":
                         liStyle = xbmcgui.ListItem("Serie italiane")
+                        liStyle.setArt({"thumb": raiplay.getThumbnailUrl("http://www.rai.it/dl/img/2018/06/04/1528107006058_ico-fiction.png")})
                         addDirectoryItem({"mode": "ondemand", "path_id": "/raiplay/tipologia/serieitaliane/index.json", "sub_type": item["sub-type"]}, liStyle)
                         liStyle = xbmcgui.ListItem("Original")
+                        liStyle.setArt({"thumb": raiplay.getThumbnailUrl("http://www.rai.it/dl/img/2018/06/04/1528107006058_ico-fiction.png")})
                         addDirectoryItem({"mode": "ondemand_subhome", "path_id": "/raiplay/tipologia/original/index.json", "sub_type": item["sub-type"]}, liStyle)
                     elif m[0]=="serietv":
                         liStyle = xbmcgui.ListItem("Serie internazionali")
+                        liStyle.setArt({"thumb": raiplay.getThumbnailUrl("http://www.rai.it/dl/img/2018/06/04/1528107006058_ico-fiction.png")})
                         addDirectoryItem({"mode": "ondemand_subhome", "path_id": "/raiplay/tipologia/serieinternazionali/index.json", "sub_type": item["sub-type"]}, liStyle)
+                    elif m[0]=="bambini" or m[0]=="bambini/":
+                        liStyle = xbmcgui.ListItem("Bambini")
+                        if "image" in item:
+                            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["image"])})
+                        addDirectoryItem({"mode": "ondemand_subhome", "path_id": "/raiplay/tipologia/bambini/index.json", "sub_type": item["sub-type"]}, liStyle)
+
+                        liStyle = xbmcgui.ListItem("Teen")
+                        if "image" in item:
+                            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["image"])})
+                        addDirectoryItem({"mode": "ondemand_subhome", "path_id": "/raiplay/tipologia/teen/index.json", "sub_type": item["sub-type"]}, liStyle)
+
                     else:
                         liStyle = xbmcgui.ListItem(item["name"])
+                        if "image" in item:
+                            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(item["image"])})
                         item["PathID"] = "/raiplay/tipologia/%s/index.json" % m[0]   
                         addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
     
     # add new item not in old json
     liStyle = xbmcgui.ListItem(Addon.getLocalizedString(32012))
+    liStyle.setArt({"thumb": raiplay.getThumbnailUrl("/dl/img/2018/06/04/1528115285089_ico-teatro.png")})
     addDirectoryItem({"mode": "ondemand", "path_id": "https://www.raiplay.it/performing-arts/index.json", "sub_type": "RaiPlay Tipologia Page"}, liStyle)
 
     liStyle = xbmcgui.ListItem("Cerca")

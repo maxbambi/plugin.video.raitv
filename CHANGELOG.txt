@@ -1,3 +1,6 @@
+[B]3.9.1[/B]
+- Fix Home Page menu
+
 [B]3.9.0[/B]
 - Fix Fiction menu empty
 
