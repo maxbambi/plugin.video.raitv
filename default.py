@@ -507,18 +507,23 @@ def show_ondemand_root():
         if item["sub-type"] in ("RaiPlay Tipologia Page", "RaiPlay Genere Page", "RaiPlay Tipologia Editoriale Page" ):
  
             if not (item["name"] in ("Teatro", "Musica")):
-                liStyle = xbmcgui.ListItem(item["name"])
                 
                 # new urls 
                 # i.e. change "/raiplay/programmi/?json" to "/raiplay/tipologia/programmi/index.json"
                 m = re.findall("raiplay/(.*?)/[?]json", item["PathID"])
                 if m:
                     if m[0]=="fiction":
-                        m[0]="serieitaliane"
-                    
-                    item["PathID"] = "/raiplay/tipologia/%s/index.json" % m[0]   
-
-                    addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
+                        liStyle = xbmcgui.ListItem("Serie italiane")
+                        addDirectoryItem({"mode": "ondemand", "path_id": "/raiplay/tipologia/serieitaliane/index.json", "sub_type": item["sub-type"]}, liStyle)
+                        liStyle = xbmcgui.ListItem("Original")
+                        addDirectoryItem({"mode": "ondemand_subhome", "path_id": "/raiplay/tipologia/original/index.json", "sub_type": item["sub-type"]}, liStyle)
+                    elif m[0]=="serietv":
+                        liStyle = xbmcgui.ListItem("Serie internazionali")
+                        addDirectoryItem({"mode": "ondemand_subhome", "path_id": "/raiplay/tipologia/serieinternazionali/index.json", "sub_type": item["sub-type"]}, liStyle)
+                    else:
+                        liStyle = xbmcgui.ListItem(item["name"])
+                        item["PathID"] = "/raiplay/tipologia/%s/index.json" % m[0]   
+                        addDirectoryItem({"mode": "ondemand", "path_id": item["PathID"], "sub_type": item["sub-type"]}, liStyle)
     
     # add new item not in old json
     liStyle = xbmcgui.ListItem(Addon.getLocalizedString(32012))
