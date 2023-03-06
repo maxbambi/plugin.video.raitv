@@ -65,10 +65,10 @@ class RaiPlay:
         response = json.loads(utils.checkStr(urllib2.urlopen(self.onAirUrl).read()))
         return response["on_air"]
     
-    def getHomePage(self):
-        response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + 'index.json').read()))
+    def getHomePage(self, defaultUrl):
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + defaultUrl).read()))
         return response["contents"]
-      
+ 
     def getRaiSportLivePage(self):
         chList = []
         try:
@@ -342,3 +342,19 @@ class RaiPlay:
             url = url.replace("[RESOLUTION]", "256x-")
         return url
  
+    def getThumbnailUrl2(self, item):
+        if "images" in item:
+            if "landscape" in item["images"]:
+                url = item["images"]["landscape"]
+                return self.getThumbnailUrl(url)
+            elif "landscape43" in item["images"]:
+                url = item["images"]["landscape43"]
+                return self.getThumbnailUrl(url)
+            elif "portrait" in item["images"]:
+                url = item["images"]["portrait"]
+                return self.getThumbnailUrl(url)
+            elif "portrait43" in item["images"]:
+                url = item["images"]["portrait43"]
+                return self.getThumbnailUrl(url)
+                
+        return self.noThumbUrl
