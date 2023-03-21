@@ -1,3 +1,9 @@
+[B]3.9.2[/B]
+- Fix subtitles with filename with spaces
+
+[B]3.9.0[/B]
+- 3.9.0 Merge from matrix version 
+
 [B]3.6.0[/B]
 - 3.6.0 fix Radio Rai streams
 

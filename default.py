@@ -161,6 +161,12 @@ def play(url, pathId="", srt=[]):
             srt = [raiplay.baseUrl[:-1] + sub['url'] for sub in metadata.get("subtitlesArray", [])]
 
         if srt:
+            srt2 = []
+            for s in srt:
+                s= urlparse.quote(s, safe=':/')
+                srt2.append(s)
+
+            srt = srt2
             xbmc.log("SRT URL: {}".format(srt))
 
     if "relinkerServlet" in url:
