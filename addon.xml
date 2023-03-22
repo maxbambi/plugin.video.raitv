@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.raitv"
        name="Rai Play"
-       version="3.9.2"
+       version="3.9.3"
        provider-name="Nightflyer, cttynul, maxbambi, fabpolli">
   <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
-    <import addon="script.common.plugin.cache" version="2.6.0"/>
-    <import addon="script.module.inputstreamhelper"/>
+        <import addon="xbmc.python" version="3.0.0"/>    
+        <import addon="script.common.plugin.cache" version="2.6.0"/>
+        <import addon="script.module.inputstreamhelper"/>
   </requires>
   <extension point="xbmc.python.pluginsource"
             library="default.py">
@@ -30,26 +30,17 @@ Source: https://github.com/maxbambi/plugin.video.raitv/
     <website>https://github.com/maxbambi/plugin.video.raitv/</website>
     <email></email>
     <news>
+[B]3.9.3[/B]
+- Fix Raisport Archive
+
 [B]3.9.2[/B]
-- Fix subtitles with filename with spaces
+- Fix subtitles with filename with spaces 
+
+[B]3.9.1[/B]
+- Fix Home Page Menu 
+
 [B]3.9.0[/B]
-- Merge new fixes from matrix version  
-[B]3.6.0[/B]
-- Fix Radio Rai audio streams 
-[B]3.5.2[/B]
-- Fix subtitles 
-[B]3.5.1[/B]
-- Fix new urls for VOD   
-[B]3.5.0[/B]
-- Plugin works with Widevine DRM  
-[B]3.4.8[/B]
-- Updated User-Agent
-- Plugin can stream mpd  
-[B]3.4.7[/B]
-- Translations
-- Added new items for viewing all elements of a category.
-- On air menu shows also current programs. 
-- Added new section from home page of Raiplay.
+- Fix Fiction Menu empty
     </news>
     <source>https://github.com/maxbambi/plugin.video.raitv/</source>
     <assets>
