@@ -760,26 +760,32 @@ def get_raisport_main():
     raiplay = RaiPlay(Addon)
     
     for k in raisport_keys:
-        liStyle = xbmcgui.ListItem(k['title'])
-        addDirectoryItem({"mode": "raisport_item", 'dominio': k['dominio'], 'sub_keys': k['sub_keys']}, liStyle)
+        title = k.get("title","")
+        
+        if title:
+            liStyle = xbmcgui.ListItem(title)
+            addDirectoryItem({"mode": "raisport_item", "dominio": k["dominio"], "key": k["key"], "sub_keys": k.get("sub_keys",[])}, liStyle)
 
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_NONE)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def get_raisport_items(params):
     dominio = params.get('dominio','')
+    key = params.get('key','')
+    
     sub_keys = eval(params.get("sub_keys","[]"))
     xbmc.log("Build Rai Sport menu of item %s " % sub_keys[0])
 
+    liStyle = xbmcgui.ListItem("Tutti i video")
+    addDirectoryItem({"mode": "raisport_subitem", "dominio" : dominio , "key": key}, liStyle)
+
     for i in range(0, len(sub_keys)):
         key = sub_keys[i]
-        title = key.split("|")[0]
+        title = key.get("title","")
         title = utils.checkStr(HTMLParser.HTMLParser().unescape(title))
-        if i==0:
-            title = "Tutto su " + title
         
         liStyle = xbmcgui.ListItem(title)
-        addDirectoryItem({"mode": "raisport_subitem", 'dominio': dominio, 'key': key}, liStyle)
+        addDirectoryItem({"mode": "raisport_subitem", "dominio" : key["dominio"] , "key": key["key"]}, liStyle)
 
     xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_NONE)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
@@ -791,7 +797,6 @@ def get_raisport_videos(params):
     key = params.get('key','')
     dominio = params.get('dominio','')
     page = params.get('page',0)
-    
     
     response = raiplay.getRaiSportVideos(key, dominio, page)
     for r in response:

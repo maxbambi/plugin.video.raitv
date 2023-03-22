@@ -1,4 +1,7 @@
-[B]3.9.1[/B]
+[B]3.9.3[/B]
+- Fix Raisport Archive
+
+[B]3.9.2[/B]
 - Fix subtitles with filename with spaces
 
 [B]3.9.1[/B]
