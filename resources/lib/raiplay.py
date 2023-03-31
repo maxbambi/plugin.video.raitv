@@ -95,7 +95,7 @@ class RaiPlay:
             categName = c.get("name","")
             categCode =  c.get("uniqueName","")
             categChildren = c.get("children", [])
-            xbmc.log("Raisport: sto per aggiungere %s" % (categName + "|" + categCode) )
+            xbmc.log("Raisport: sto per aggiungere " + categName + "|" + categCode )
             if categName:
             
                 sub_keys = []
@@ -103,17 +103,12 @@ class RaiPlay:
                     subcategName = c2.get("name","")
                     subcategCode =  c2.get("uniqueName","")
                     if subcategName:
-                        xbmc.log("Raisport: aggiunto %s" % (subcategName+"|"+subcategCode) )
                         sub_keys.append({'title': subcategName , "dominio": dominio, "key" : (subcategName+"|"+subcategCode)})
 
-                xbmc.log("Raisport: aggiunto %s" % subcategName )
                 RaiSportKeys.append({'title': categName , "dominio": dominio, "key": (categName + "|" + categCode), 'sub_keys' : sub_keys })
         
-        #good_links.append({'title': self.RaiPlayAddonHandle.getLocalizedString(32015), 'url' : '/archivio.html?tematica=altri-sport'})
-        
-        # open any single page in list and grab search keys
-        
         return RaiSportKeys
+
     
     def getRaiSportVideos(self, key, domain, page):
         videos = []
