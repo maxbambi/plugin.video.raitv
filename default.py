@@ -191,7 +191,7 @@ def play(url, pathId="", srt=[]):
         item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
     except: 
         item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
-
+    
     if "dash" in ct or "mpd" in ct :
         if KODI_VERSION_MAJOR >= 19:
             item.setProperty('inputstream', 'inputstream.adaptive')
@@ -228,6 +228,43 @@ def play(url, pathId="", srt=[]):
     if srt:
         item.setSubtitles(srt)
     xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
+
+def show_tv_channels():
+    xbmc.log("Raiplay: get Rai channels: ")
+
+    raiplay = RaiPlay(Addon)
+    onAirJson = raiplay.getOnAir()
+    
+    for station in tv_stations:
+        chName = station["channel"]
+        current = thumb = ""
+        for d in onAirJson:
+            if chName == d["channel"]:
+                current = d["currentItem"].get("name","")
+                thumb = d["currentItem"].get("image","")
+                chName = "[COLOR yellow]" + chName + "[/COLOR]: " + current
+                break
+        
+        liStyle = xbmcgui.ListItem(chName)
+        if thumb:
+            liStyle.setArt({"thumb": raiplay.getUrl(thumb)})
+        else:
+            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
+        liStyle.setInfo("video", {})
+        addLinkItem({"mode": "play",
+            "url": station["video"]["contentUrl"]}, liStyle)
+    #rai sport web streams
+    xbmc.log("Raiplay: get Rai sport web channels: ")
+
+    chList = raiplay.getRaiSportLivePage()
+    xbmc.log(str(chList))
+    for ch in chList:
+        liStyle = xbmcgui.ListItem("[COLOR green]" + ch['title'] + "[/COLOR]")
+        liStyle.setArt({"thumb": ch['icon']})
+        liStyle.setInfo("video", {})
+        addLinkItem({"mode": "play", "url": ch["url"]}, liStyle)
+    
+    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_radio_stations():
     for station in radio_stations:
