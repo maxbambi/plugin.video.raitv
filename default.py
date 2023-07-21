@@ -191,8 +191,8 @@ def play(url, pathId="", srt=[]):
         item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
     except: 
         item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
-    
-    if "dash" in ct :
+
+    if "dash" in ct or "mpd" in ct :
         if KODI_VERSION_MAJOR >= 19:
             item.setProperty('inputstream', 'inputstream.adaptive')
         else:
@@ -201,49 +201,33 @@ def play(url, pathId="", srt=[]):
         item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         item.setMimeType('application/dash+xml')
         if key:
+            
+            if "anycast.nagra.com" in key:
+                posAuth = key.find("?Authorization")     
+                key1 = key[:posAuth]
+                
+                license_headers = {
+                    "Accept":"application/octet-stream",
+                    "Content-Type":"application/octet-stream",
+                    'Nv-Authorizations': key[posAuth + 15:]  ,
+                    "Referer":"https://www.raiplay.it/",
+                    'Origin': 'https://www.raiplay.it',
+                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+                }
+                
+                key_string = key1 + "|" + urlencode(license_headers) + "|R{SSM}|"
+
+            else:
+                key_string = key + "||R{SSM}|"
+            
             item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
-            item.setProperty("inputstream.adaptive.license_key",  key + "||R{SSM}|")
-    
+            item.setProperty("inputstream.adaptive.license_key",  key_string)
+            xbmc.log("*******************************************************************************************************************") 
+            xbmc.log("Key string: %s" % key_string) 
+            xbmc.log("*******************************************************************************************************************") 
     if srt:
         item.setSubtitles(srt)
     xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
-
-def show_tv_channels():
-    xbmc.log("Raiplay: get Rai channels: ")
-
-    raiplay = RaiPlay(Addon)
-    onAirJson = raiplay.getOnAir()
-    
-    for station in tv_stations:
-        chName = station["channel"]
-        current = thumb = ""
-        for d in onAirJson:
-            if chName == d["channel"]:
-                current = d["currentItem"].get("name","")
-                thumb = d["currentItem"].get("image","")
-                chName = "[COLOR yellow]" + chName + "[/COLOR]: " + current
-                break
-        
-        liStyle = xbmcgui.ListItem(chName)
-        if thumb:
-            liStyle.setArt({"thumb": raiplay.getUrl(thumb)})
-        else:
-            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
-        liStyle.setInfo("video", {})
-        addLinkItem({"mode": "play",
-            "url": station["video"]["contentUrl"]}, liStyle)
-    #rai sport web streams
-    xbmc.log("Raiplay: get Rai sport web channels: ")
-
-    chList = raiplay.getRaiSportLivePage()
-    xbmc.log(str(chList))
-    for ch in chList:
-        liStyle = xbmcgui.ListItem("[COLOR green]" + ch['title'] + "[/COLOR]")
-        liStyle.setArt({"thumb": ch['icon']})
-        liStyle.setInfo("video", {})
-        addLinkItem({"mode": "play", "url": ch["url"]}, liStyle)
-    
-    xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_radio_stations():
     for station in radio_stations:

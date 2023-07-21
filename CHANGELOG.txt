@@ -1,3 +1,6 @@
+[B]3.9.4[/B]
+- Fix playing of Widevine encrypted content
+
 [B]3.9.3[/B]
 - Fix Raisport Archive
 
