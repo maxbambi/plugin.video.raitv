@@ -142,12 +142,13 @@ def show_tgr_list(mode, url):
 
 def play(url, pathId="", srt=[]):
     KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-    xbmc.log("Playing...")
+    xbmc.log("*******************************************************************************************************************",xbmc.LOGINFO) 
+    xbmc.log("************************   plugin.video.raitv    Playing.... ******************************************************",xbmc.LOGINFO) 
     
     ct = ""
     key = ""
     if pathId != "":
-        xbmc.log("PathID: " + pathId)
+        xbmc.log("PathID: " + pathId, xbmc.LOGINFO)
 
         # Ugly hack
         if pathId[:7] == "/audio/":
@@ -167,12 +168,12 @@ def play(url, pathId="", srt=[]):
                 srt2.append(s)
             
             srt = srt2
-            xbmc.log("SRT URL: {}".format(srt))
+            xbmc.log("Subtitles Url: {}".format(srt), xbmc.LOGINFO)
 
 
     if "relinkerServlet" in url:
         url = url.replace ("https:", "http:")
-        xbmc.log("Relinker URL: " + url)
+        xbmc.log("Relinker URL: " + url, xbmc.LOGINFO)
         relinker = Relinker()
         params = relinker.getURL(url)
         url = params.get('url','')
@@ -183,8 +184,8 @@ def play(url, pathId="", srt=[]):
     if url[0] == "/":
         url = raiplay.baseUrl[:-1] + url
     
-    xbmc.log("Media URL: " + url)
-    xbmc.log("Media format: %s - License Url: %s" % (ct,key))
+    xbmc.log("Media URL: " + url, xbmc.LOGINFO)
+    xbmc.log("Media format: %s - License Url: %s" % (ct,key), xbmc.LOGINFO)
     
     # Play the item
     try: 
@@ -222,11 +223,12 @@ def play(url, pathId="", srt=[]):
             
             item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
             item.setProperty("inputstream.adaptive.license_key",  key_string)
-            xbmc.log("*******************************************************************************************************************") 
-            xbmc.log("Key string: %s" % key_string) 
-            xbmc.log("*******************************************************************************************************************") 
+            xbmc.log("Key string: %s" % key_string,xbmc.LOGINFO) 
+
     if srt:
         item.setSubtitles(srt)
+
+    xbmc.log("*******************************************************************************************************************",xbmc.LOGINFO) 
     xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
 
 def show_tv_channels():

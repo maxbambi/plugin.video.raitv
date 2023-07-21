@@ -1,3 +1,6 @@
+[B]3.9.5[/B]
+- New playing informations written in log
+
 [B]3.9.4[/B]
 - Fix playing of Widevine encrypted content
 
