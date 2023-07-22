@@ -52,7 +52,6 @@ class Relinker:
         if "output" in qs:
             del(qs['output'])
         
-        #qs['output'] = "20" # only url
         qs['output'] = "56" # xml stream data  
         
         query = urlencode(qs, True)
