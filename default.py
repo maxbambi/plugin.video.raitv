@@ -192,13 +192,15 @@ def play(url, pathId="", srt=[]):
         item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
     except: 
         item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
-    
-    if "dash" in ct or "mpd" in ct :
-        if KODI_VERSION_MAJOR >= 19:
-            item.setProperty('inputstream', 'inputstream.adaptive')
-        else:
-            item.setProperty('inputstreamaddon', 'inputstream.adaptive')
 
+    if KODI_VERSION_MAJOR >= 19:
+        item.setProperty('inputstream', 'inputstream.adaptive')
+    else:
+        item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+
+    if "hls" in ct:
+        item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+    elif "dash" in ct or "mpd" in ct :
         item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         item.setMimeType('application/dash+xml')
         if key:

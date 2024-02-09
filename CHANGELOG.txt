@@ -1,3 +1,9 @@
+[B]4.1.0[/B]
+- Try to fix streaming
+
+[B]4.0.0[/B]
+- New search API
+
 [B]3.9.4[/B]
 - Fix playing of Widevine encrypted content
 
