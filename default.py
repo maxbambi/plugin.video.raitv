@@ -142,13 +142,13 @@ def show_tgr_list(mode, url):
 
 def play(url, pathId="", srt=[]):
     KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
-    xbmc.log("*******************************************************************************************************************",xbmc.LOGINFO) 
-    xbmc.log("************************   plugin.video.raitv    Playing.... ******************************************************",xbmc.LOGINFO) 
+    xbmc.log("*******************************************************************************************************************") 
+    xbmc.log("************************   plugin.video.raitv    Playing.... ******************************************************") 
     
     ct = ""
     key = ""
     if pathId != "":
-        xbmc.log("PathID: " + pathId, xbmc.LOGINFO)
+        xbmc.log("PathID: " + pathId)
 
         # Ugly hack
         if pathId[:7] == "/audio/":
@@ -168,12 +168,12 @@ def play(url, pathId="", srt=[]):
                 srt2.append(s)
             
             srt = srt2
-            xbmc.log("Subtitles Url: {}".format(srt), xbmc.LOGINFO)
+            xbmc.log("Subtitles Url: {}".format(srt))
 
 
     if "relinkerServlet" in url:
         url = url.replace ("https:", "http:")
-        xbmc.log("Relinker URL: " + url, xbmc.LOGINFO)
+        xbmc.log("Relinker URL: " + url)
         relinker = Relinker()
         params = relinker.getURL(url)
         url = params.get('url','')
@@ -184,8 +184,8 @@ def play(url, pathId="", srt=[]):
     if url[0] == "/":
         url = raiplay.baseUrl[:-1] + url
     
-    xbmc.log("Media URL: " + url, xbmc.LOGINFO)
-    xbmc.log("Media format: %s - License Url: %s" % (ct,key), xbmc.LOGINFO)
+    xbmc.log("Media URL: " + url)
+    xbmc.log("Media format: %s - License Url: %s" % (ct,key))
     
     # Play the item
     try: 
@@ -198,9 +198,7 @@ def play(url, pathId="", srt=[]):
     else:
         item.setProperty('inputstreamaddon', 'inputstream.adaptive')
 
-    if "hls" in ct:
-        item.setProperty('inputstream.adaptive.manifest_type', 'hls')
-    elif "dash" in ct or "mpd" in ct :
+    if "dash" in ct or "mpd" in ct :
         item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         item.setMimeType('application/dash+xml')
         if key:
@@ -225,12 +223,15 @@ def play(url, pathId="", srt=[]):
             
             item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
             item.setProperty("inputstream.adaptive.license_key",  key_string)
-            xbmc.log("Key string: %s" % key_string,xbmc.LOGINFO) 
+            xbmc.log("Key string: %s" % key_string) 
+
+    else:
+        item.setProperty('inputstream.adaptive.manifest_type', 'hls')
 
     if srt:
         item.setSubtitles(srt)
 
-    xbmc.log("*******************************************************************************************************************",xbmc.LOGINFO) 
+    xbmc.log("*******************************************************************************************************************") 
     xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
 
 
