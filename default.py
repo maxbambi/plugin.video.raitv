@@ -140,13 +140,15 @@ def show_tgr_list(mode, url):
                 "url": item["url"]}, liStyle)            
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
-def play(url, pathId="", srt=[]):
+def play(url, pathId="", radio=False, srt=[]):
     KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
     xbmc.log("*******************************************************************************************************************") 
     xbmc.log("************************   plugin.video.raitv    Playing.... ******************************************************") 
     
     ct = ""
     key = ""
+    isAudio = False
+    
     if pathId != "":
         xbmc.log("PathID: " + pathId)
 
@@ -154,7 +156,8 @@ def play(url, pathId="", srt=[]):
         if pathId[:7] == "/audio/":
             raiplayradio = RaiPlayRadio()
             metadata = raiplayradio.getAudioMetadata(pathId)
-            url = metadata["contentUrl"]
+            url = metadata["url"]
+            
         else:
             raiplay = RaiPlay(Addon)
             metadata = raiplay.getVideoMetadata(pathId)
@@ -188,45 +191,56 @@ def play(url, pathId="", srt=[]):
     xbmc.log("Media format: %s - License Url: %s" % (ct,key))
     
     # Play the item
-    try: 
-        item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
-    except: 
-        item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
-
-    if KODI_VERSION_MAJOR >= 19:
-        item.setProperty('inputstream', 'inputstream.adaptive')
+    
+    if radio:
+        item=xbmcgui.ListItem(path=url)
     else:
-        item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+    
+        try: 
+            item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
+        except: 
+            item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
+        
+        if KODI_VERSION_MAJOR >= 19:
+            item.setProperty('inputstream', 'inputstream.adaptive')
+        else:
+            item.setProperty('inputstreamaddon', 'inputstream.adaptive')
 
-    if "dash" in ct or "mpd" in ct :
-        item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-        item.setMimeType('application/dash+xml')
-        if key:
-            
-            if "anycast.nagra.com" in key:
-                posAuth = key.find("?Authorization")     
-                key1 = key[:posAuth]
+        if "dash" in ct or "mpd" in ct :
+            item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+            item.setMimeType('application/dash+xml')
+            if key:
                 
-                license_headers = {
-                    "Accept":"application/octet-stream",
-                    "Content-Type":"application/octet-stream",
-                    'Nv-Authorizations': key[posAuth + 15:]  ,
-                    "Referer":"https://www.raiplay.it/",
-                    'Origin': 'https://www.raiplay.it',
-                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
-                }
+                if "anycast.nagra.com" in key:
+                    posAuth = key.find("?Authorization")     
+                    key1 = key[:posAuth]
+                    
+                    license_headers = {
+                        "Accept":"application/octet-stream",
+                        "Content-Type":"application/octet-stream",
+                        'Nv-Authorizations': key[posAuth + 15:]  ,
+                        "Referer":"https://www.raiplay.it/",
+                        "Origin": "https://www.raiplay.it",
+                        "Sec-Ch-Ua": '"Google Chrome";v="123","Not:A-Brand";v="8","Chromium";v="123"',
+                        "Sec-Ch-Ua-Mobile": "?0",
+                        "Sec-Ch-Ua-Platform": '"Windows"',
+                        'sec-fetch-dest': 'empty',
+                        'sec-fetch-mode': 'cors',
+                        'sec-fetch-site': 'cross-site',
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+                    }
+                    
+                    key_string = key1 + "|" + urlencode(license_headers) + "|R{SSM}|"
+
+                else:
+                    key_string = key + "||R{SSM}|"
                 
-                key_string = key1 + "|" + urlencode(license_headers) + "|R{SSM}|"
+                item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
+                item.setProperty("inputstream.adaptive.license_key",  key_string)
+                xbmc.log("Key string: %s" % key_string) 
 
-            else:
-                key_string = key + "||R{SSM}|"
-            
-            item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
-            item.setProperty("inputstream.adaptive.license_key",  key_string)
-            xbmc.log("Key string: %s" % key_string) 
-
-    else:
-        item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        else:
+            item.setProperty('inputstream.adaptive.manifest_type', 'hls')
 
     if srt:
         item.setSubtitles(srt)
@@ -279,9 +293,9 @@ def show_radio_stations():
         liStyle.setArt({"thumb": "http://rai.it" + station["images"]["square"]})
         liStyle.setInfo("music", {})
         if 'contentUrl' in station['audio']:
-            addLinkItem({"mode": "play", "url": station["audio"]["contentUrl"]}, liStyle)
+            addLinkItem({"mode": "play", "url": station["audio"]["contentUrl"], "radio": True}, liStyle)
         else:
-            addLinkItem({"mode": "play", "url": station["audio"]["url"]}, liStyle)
+            addLinkItem({"mode": "play", "url": station["audio"]["url"], "radio": True}, liStyle)
         
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
@@ -409,11 +423,13 @@ def show_replay_tv_channels(date):
     
 def show_replay_radio_channels(date):
     for station in radio_stations:
-        liStyle = xbmcgui.ListItem(station["channel"])
-        liStyle.setArt({"thumb": station["stillFrame"]})
+        ch = station["channel"]
+        xbmc.log(str(ch))
+        liStyle = xbmcgui.ListItem(ch["name"])
+        liStyle.setArt({"thumb": "http://rai.it" + station["images"]["square"]})
         addDirectoryItem({"mode": "replay",
             "media": "radio",
-            "channel_id": station["channel"].encode("utf-8"),
+            "channel_id": ch["palinsesto_url"],
             "date": date}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
@@ -499,13 +515,15 @@ def show_replay_radio_epg(date, channelId):
     xbmc.log("Showing EPG for " + channelId + " on " + date)
     raiplayradio = RaiPlayRadio()
 
-    programmes = raiplayradio.getProgrammes(channelId.decode("utf-8"), date)
+    programmes = raiplayradio.getProgrammes(channelId, date)
+    
+    
     
     for programme in programmes:
         if not programme:
             continue
     
-        startTime = programme["timePublished"]
+        startTime = programme["hour"]
         title = programme["name"]
         
         if programme["images"]["landscape"] != "":
@@ -515,8 +533,8 @@ def show_replay_radio_epg(date, channelId):
         else:
             thumb = raiplayradio.noThumbUrl
         
-        if programme["hasAudio"]:
-            audioUrl = programme["pathID"]
+        if programme["has_audio"]:
+            audioUrl = programme["path_id"]
         else:
             audioUrl = None
         
@@ -855,6 +873,7 @@ index = str(params.get("index", ""))
 pathId = str(params.get("path_id", ""))
 subType = str(params.get("sub_type", ""))
 tags = str(params.get("tags", ""))
+radio =  str(params.get("radio", False))
 
 if mode == "live_tv":
     show_tv_channels()
@@ -926,7 +945,7 @@ elif mode == "get_last_content_by_tag":
      get_last_content_by_tag(tags)
 
 elif mode == "play" or mode =="raiplay_videos":
-    play(url, pathId)
+    play(url, pathId, radio)
 elif mode == "raisport_main":
     get_raisport_main()
 elif mode == "raisport_item":
