@@ -1,3 +1,6 @@
+[B]4.2.2[/B]
+- Fix images
+
 [B]4.2.1[/B]
 - Try to fix home page
 
