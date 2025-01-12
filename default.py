@@ -305,6 +305,8 @@ def show_home(defaultUrl="index.json"):
     
     for item in response:
         item_type = item.get("type","")
+        name_block = item.get("name"," ")
+        xbmc.log("----------->" + name_block + " ---- " + item_type)
         if item_type == "RaiPlay Hero Block":
             for item2 in item["contents"]:
                 sub_type = item2["type"]
@@ -343,8 +345,13 @@ def show_home(defaultUrl="index.json"):
             # populate subItems array
             subItems=[]
             for item2 in item["contents"]:
-                item2_name = item2.get("name", "[No name]")
-                subItems.append({"mode": "ondemand", "name": item2_name, "path_id": item2["path_id"], "video_url": item2.get("video_url",""), "sub_type": item2["type"], "icon": raiplay.getThumbnailUrl2(item2)})
+                item2_name = item2.get("name", "")
+                if not item2_name:
+                    item2_name = item2.get("toptitle", "")
+                
+                if item2_name:    
+                    xbmc.log( " Nome item2 : "+ item2_name)
+                    subItems.append({"mode": "ondemand", "name": item2_name, "path_id": item2["path_id"], "video_url": item2.get("video_url",""), "sub_type": item2["type"], "icon": raiplay.getThumbnailUrl2(item2)})
                 
             liStyle = xbmcgui.ListItem(item['name'])
             addDirectoryItem({"mode": "ondemand_slider", "sub_items": json.dumps(subItems)}, liStyle)

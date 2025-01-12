@@ -311,7 +311,7 @@ class RaiPlay:
         return url
         
     def getThumbnailUrl(self, pathId):
-        if pathId == "":
+        if not pathId :
             url = self.noThumbUrl
         else:
             url = self.getUrl(pathId)
