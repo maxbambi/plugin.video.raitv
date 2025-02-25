@@ -1,3 +1,6 @@
+[B]4.2.3[/B]
+- Fix error occurring when url is empty
+
 [B]4.2.2[/B]
 - Fix images
 

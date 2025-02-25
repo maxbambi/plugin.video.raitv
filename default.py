@@ -182,71 +182,76 @@ def play(url, pathId="", radio=False, srt=[]):
         url = params.get('url','')
         ct = params.get('ct','')
         key = params.get('key','')
+    
+    if not url:
+        xbmc.log("Media URL is missing !")
         
-    # Add the server to the URL if missing
-    if url[0] == "/":
-        url = raiplay.baseUrl[:-1] + url
-    
-    xbmc.log("Media URL: " + url)
-    xbmc.log("Media format: %s - License Url: %s" % (ct,key))
-    
-    # Play the item
-    
-    if radio:
-        item=xbmcgui.ListItem(path=url)
     else:
-    
-        try: 
-            item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
-        except: 
-            item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
+                
+        # Add the server to the URL if missing
+        if url[0] == "/":
+            url = raiplay.baseUrl[:-1] + url
         
-        if KODI_VERSION_MAJOR >= 19:
-            item.setProperty('inputstream', 'inputstream.adaptive')
+        xbmc.log("Media URL: " + url)
+        xbmc.log("Media format: %s - License Url: %s" % (ct,key))
+        
+        # Play the item
+        
+        if radio:
+            item=xbmcgui.ListItem(path=url)
         else:
-            item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+        
+            try: 
+                item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
+            except: 
+                item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
+            
+            if KODI_VERSION_MAJOR >= 19:
+                item.setProperty('inputstream', 'inputstream.adaptive')
+            else:
+                item.setProperty('inputstreamaddon', 'inputstream.adaptive')
 
-        if "dash" in ct or "mpd" in ct :
-            item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-            item.setMimeType('application/dash+xml')
-            if key:
-                
-                if "anycast.nagra.com" in key:
-                    posAuth = key.find("?Authorization")     
-                    key1 = key[:posAuth]
+            if "dash" in ct or "mpd" in ct :
+                item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+                item.setMimeType('application/dash+xml')
+                if key:
                     
-                    license_headers = {
-                        "Accept":"application/octet-stream",
-                        "Content-Type":"application/octet-stream",
-                        'Nv-Authorizations': key[posAuth + 15:]  ,
-                        "Referer":"https://www.raiplay.it/",
-                        "Origin": "https://www.raiplay.it",
-                        "Sec-Ch-Ua": '"Google Chrome";v="123","Not:A-Brand";v="8","Chromium";v="123"',
-                        "Sec-Ch-Ua-Mobile": "?0",
-                        "Sec-Ch-Ua-Platform": '"Windows"',
-                        'sec-fetch-dest': 'empty',
-                        'sec-fetch-mode': 'cors',
-                        'sec-fetch-site': 'cross-site',
-                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
-                    }
+                    if "anycast.nagra.com" in key:
+                        posAuth = key.find("?Authorization")     
+                        key1 = key[:posAuth]
+                        
+                        license_headers = {
+                            "Accept":"application/octet-stream",
+                            "Content-Type":"application/octet-stream",
+                            'Nv-Authorizations': key[posAuth + 15:]  ,
+                            "Referer":"https://www.raiplay.it/",
+                            "Origin": "https://www.raiplay.it",
+                            "Sec-Ch-Ua": '"Google Chrome";v="123","Not:A-Brand";v="8","Chromium";v="123"',
+                            "Sec-Ch-Ua-Mobile": "?0",
+                            "Sec-Ch-Ua-Platform": '"Windows"',
+                            'sec-fetch-dest': 'empty',
+                            'sec-fetch-mode': 'cors',
+                            'sec-fetch-site': 'cross-site',
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+                        }
+                        
+                        key_string = key1 + "|" + urlencode(license_headers) + "|R{SSM}|"
+
+                    else:
+                        key_string = key + "||R{SSM}|"
                     
-                    key_string = key1 + "|" + urlencode(license_headers) + "|R{SSM}|"
+                    item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
+                    item.setProperty("inputstream.adaptive.license_key",  key_string)
+                    xbmc.log("Key string: %s" % key_string) 
 
-                else:
-                    key_string = key + "||R{SSM}|"
-                
-                item.setProperty("inputstream.adaptive.license_type", 'com.widevine.alpha')
-                item.setProperty("inputstream.adaptive.license_key",  key_string)
-                xbmc.log("Key string: %s" % key_string) 
+            else:
+                item.setProperty('inputstream.adaptive.manifest_type', 'hls')
 
-        else:
-            item.setProperty('inputstream.adaptive.manifest_type', 'hls')
+        if srt:
+            item.setSubtitles(srt)
 
-    if srt:
-        item.setSubtitles(srt)
-
-    xbmc.log("*******************************************************************************************************************") 
-    xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
+        xbmc.log("*******************************************************************************************************************") 
+        xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
 
 
 def show_tv_channels():
