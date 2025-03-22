@@ -140,7 +140,7 @@ def show_tgr_list(mode, url):
                 "url": item["url"]}, liStyle)            
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
-def play(url, pathId="", radio=False, srt=[]):
+def play(url, pathId="", radio_stream='0', srt=[]):
     KODI_VERSION_MAJOR = int(xbmc.getInfoLabel('System.BuildVersion').split('.')[0])
     xbmc.log("*******************************************************************************************************************") 
     xbmc.log("************************   plugin.video.raitv    Playing.... ******************************************************") 
@@ -197,10 +197,11 @@ def play(url, pathId="", radio=False, srt=[]):
         
         # Play the item
         
-        if radio:
+        if radio_stream=='1':
+            xbmc.log("Playing an only audio content...... radio_stream value: %s" % radio_stream)
             item=xbmcgui.ListItem(path=url)
         else:
-        
+            xbmc.log("Playing a video content...... radio_stream value: %s" % radio_stream)
             try: 
                 item=xbmcgui.ListItem(path=url + '|User-Agent=' + urllib.quote_plus(Relinker.UserAgent))
             except: 
@@ -226,13 +227,13 @@ def play(url, pathId="", radio=False, srt=[]):
                             'Nv-Authorizations': key[posAuth + 15:]  ,
                             "Referer":"https://www.raiplay.it/",
                             "Origin": "https://www.raiplay.it",
-                            "Sec-Ch-Ua": '"Google Chrome";v="123","Not:A-Brand";v="8","Chromium";v="123"',
+                            "Sec-Ch-Ua": '"Google Chrome";v="134","Not:A-Brand";v="24","Chromium";v="134"',
                             "Sec-Ch-Ua-Mobile": "?0",
                             "Sec-Ch-Ua-Platform": '"Windows"',
                             'sec-fetch-dest': 'empty',
                             'sec-fetch-mode': 'cors',
                             'sec-fetch-site': 'cross-site',
-                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
                         }
                         
                         key_string = key1 + "|" + urlencode(license_headers) + "|R{SSM}|"
@@ -298,9 +299,9 @@ def show_radio_stations():
         liStyle.setArt({"thumb": "http://rai.it" + station["images"]["square"]})
         liStyle.setInfo("music", {})
         if 'contentUrl' in station['audio']:
-            addLinkItem({"mode": "play", "url": station["audio"]["contentUrl"], "radio": True}, liStyle)
+            addLinkItem({"mode": "play", "url": station["audio"]["contentUrl"], "radio": '1'}, liStyle)
         else:
-            addLinkItem({"mode": "play", "url": station["audio"]["url"], "radio": True}, liStyle)
+            addLinkItem({"mode": "play", "url": station["audio"]["url"], "radio": '1'}, liStyle)
         
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
@@ -885,7 +886,7 @@ index = str(params.get("index", ""))
 pathId = str(params.get("path_id", ""))
 subType = str(params.get("sub_type", ""))
 tags = str(params.get("tags", ""))
-radio =  str(params.get("radio", False))
+radio_stream =  str(params.get("radio", '0'))
 
 if mode == "live_tv":
     show_tv_channels()
@@ -957,7 +958,7 @@ elif mode == "get_last_content_by_tag":
      get_last_content_by_tag(tags)
 
 elif mode == "play" or mode =="raiplay_videos":
-    play(url, pathId, radio)
+    play(url, pathId, radio_stream)
 elif mode == "raisport_main":
     get_raisport_main()
 elif mode == "raisport_item":

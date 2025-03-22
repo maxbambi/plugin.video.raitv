@@ -1,3 +1,6 @@
+[B]4.2.4[/B]
+- Try to fix radio streaming 
+
 [B]4.2.3[/B]
 - Fix error occurring when url is empty
 
