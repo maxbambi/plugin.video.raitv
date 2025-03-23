@@ -209,8 +209,12 @@ def play(url, pathId="", radio_stream='0', srt=[]):
             
             if KODI_VERSION_MAJOR >= 19:
                 item.setProperty('inputstream', 'inputstream.adaptive')
+                if KODI_VERSION_MAJOR >= 20: # set manifest http headers
+                    item.setProperty('inputstream.adaptive.manifest_headers', 'User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
             else:
                 item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+
+            item.setProperty('inputstream.adaptive.stream_headers', 'User-Agent=' + urllib.parse.quote_plus(Relinker.UserAgent))
 
             if "dash" in ct or "mpd" in ct :
                 item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
@@ -247,7 +251,6 @@ def play(url, pathId="", radio_stream='0', srt=[]):
 
             else:
                 item.setProperty('inputstream.adaptive.manifest_type', 'hls')
-
         if srt:
             item.setSubtitles(srt)
 
