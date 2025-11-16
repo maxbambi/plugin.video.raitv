@@ -175,7 +175,6 @@ def play(url, pathId="", radio_stream='0', srt=[]):
 
 
     if "relinkerServlet" in url:
-        url = url.replace ("https:", "http:")
         xbmc.log("Relinker URL: " + url)
         relinker = Relinker()
         params = relinker.getURL(url)
