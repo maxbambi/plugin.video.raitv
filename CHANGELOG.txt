@@ -1,3 +1,6 @@
+[B]4.4.0[/B]
+- add support for https://github.com/dimkroon/translate_subs 
+
 [B]4.3.1[/B]
 - Fix "https:" 
 

@@ -252,6 +252,9 @@ def play(url, pathId="", radio_stream='0', srt=[]):
                 item.setProperty('inputstream.adaptive.manifest_type', 'hls')
         if srt:
             item.setSubtitles(srt)
+            item.setProperty("subtitles.translate.file",srt[0])
+            item.setProperty("subtitles.translate.type","srt")
+            item.setProperty("subtitles.translate.orig_lang","it")
 
         xbmc.log("*******************************************************************************************************************") 
         xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
