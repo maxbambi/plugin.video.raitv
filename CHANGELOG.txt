@@ -1,3 +1,6 @@
+[B]4.3.1[/B]
+- Fix "https:" 
+
 [B]4.3.0[/B]
 - New property for inputstream_adaptive_headers 
 
