@@ -1,3 +1,6 @@
+[B]4.5.0[/B]
+- new search url  
+
 [B]4.4.0[/B]
 - add support for https://github.com/dimkroon/translate_subs 
 
