@@ -1,3 +1,6 @@
+[B]4.5.1[/B]
+- force https in relinker  
+
 [B]4.5.0[/B]
 - new search url  
 

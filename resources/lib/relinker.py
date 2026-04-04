@@ -56,7 +56,7 @@ class Relinker:
         qs['output'] = "56" # xml stream data  
         
         query = urlencode(qs, True)
-        url = urlparse.urlunparse((scheme, netloc, path, params, query, fragment))
+        url = urlparse.urlunparse(("https", netloc, path, params, query, fragment))
                 
         try:
             response = utils.checkStr(urllib2.urlopen(url).read())
