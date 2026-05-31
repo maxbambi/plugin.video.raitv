@@ -28,7 +28,7 @@ class RaiPlay:
     
     # From http://www.raiplay.it/mobile/prod/config/RaiPlay_Config.json
     baseUrl = "https://www.raiplay.it/"
-    channelsUrl = "http://www.rai.it/dl/RaiPlay/2016/PublishingBlock-9a2ff311-fcf0-4539-8f8f-c4fee2a71d58.html?json"
+    channelsUrl = "https://www.raiplay.it/dirette.json"
     localizeUrl = "http://mediapolisgs.rai.it/relinker/relinkerServlet.htm?cont=201342"
     menuUrl = "http://www.rai.it/dl/RaiPlay/2016/menu/PublishingBlock-20b274b1-23ae-414f-b3bf-4bdc13b86af2.html?homejson"
     palinsestoUrl = "https://www.raiplay.it/palinsesto/app/old/[nomeCanale]/[dd-mm-yyyy].json"
@@ -60,8 +60,8 @@ class RaiPlay:
         
     def getChannels(self):
         response = json.loads(utils.checkStr(urllib2.urlopen(self.channelsUrl).read()))
-        return response["dirette"]
-    
+        return response["contents"]
+        
     def getOnAir(self):
         response = json.loads(utils.checkStr(urllib2.urlopen(self.onAirUrl).read()))
         return response["on_air"]
@@ -73,9 +73,6 @@ class RaiPlay:
     def getRaiSportLivePage(self):
         chList = []
 
-        chList.append({'title':'RaiSport Web 1', 'url': 'https://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=22590', 'icon':''})
-        chList.append({'title':'RaiSport Web 2', 'url': 'https://mediapolis.rai.it/relinker/relinkerServlet.htm?cont=35259', 'icon':''})
-        
         return chList
     
     def fillRaiSportKeys(self):

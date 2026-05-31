@@ -276,14 +276,15 @@ def show_tv_channels():
                 chName = "[COLOR yellow]" + chName + "[/COLOR]: " + current
                 break
         
+        xbmc.log(str(station))
         liStyle = xbmcgui.ListItem(chName)
         if thumb:
             liStyle.setArt({"thumb": raiplay.getUrl(thumb)})
         else:
-            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
+            liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station.get("transparent-icon",""))})
         liStyle.setInfo("video", {})
         addLinkItem({"mode": "play",
-            "url": station["video"]["contentUrl"]}, liStyle)
+            "url": station["video"]["content_url"]}, liStyle)
     #rai sport web streams
     xbmc.log("Raiplay: get Rai sport web channels: ")
 

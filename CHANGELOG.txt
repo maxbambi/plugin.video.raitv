@@ -1,3 +1,6 @@
+[B]4.5.2[/B]
+- new url for channels list  
+
 [B]4.5.1[/B]
 - force https in relinker  
 
