@@ -84,28 +84,26 @@ def show_root_menu():
     addDirectoryItem({"mode": "ondemand"}, liStyle)
     liStyle = xbmcgui.ListItem(Addon.getLocalizedString(32007))
     addDirectoryItem({"mode": "tg"}, liStyle)
-    liStyle = xbmcgui.ListItem(Addon.getLocalizedString(32008))
-    addDirectoryItem({"mode": "news"}, liStyle)
     liStyle = xbmcgui.ListItem(Addon.getLocalizedString(32010))
     addDirectoryItem({"mode": "raisport_main"}, liStyle)
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
 
 def show_tg_root():
-    search = Search()
-    try:
-        for k, v in search.newsArchives.items():
-            liStyle = xbmcgui.ListItem(k)
-            addDirectoryItem({"mode": "get_last_content_by_tag",
-                "tags": search.newsArchives[k]}, liStyle)
-    except:
-        for k, v in list(search.newsArchives.items()):
-            liStyle = xbmcgui.ListItem(k)
-            addDirectoryItem({"mode": "get_last_content_by_tag",
-                "tags": search.newsArchives[k]}, liStyle)
-    liStyle = xbmcgui.ListItem("TGR")
-    liStyle.setArt({"thumb": "https://www.tgr.rai.it/dl/tgr/mhp/immagini/splash.png"})
-    addDirectoryItem({"mode": "tgr"}, liStyle)  
-    xbmcplugin.addSortMethod(handle, xbmcplugin.SORT_METHOD_LABEL)
+    xbmc.log("Raiplay: get news root: ")
+
+    raiplay = RaiPlay(Addon)
+    items = raiplay.getNewsCollection()
+    
+    for item2 in items:
+        item2_name = item2.get("name", "")
+        if not item2_name:
+            item2_name = item2.get("toptitle", "")
+        
+        if item2_name:    
+            xbmc.log( " Nome item2 : "+ item2_name)
+            liStyle = xbmcgui.ListItem(item2_name)
+            addDirectoryItem({"mode": "ondemand", "name": item2_name, "path_id": item2["path_id"], "video_url": item2.get("video_url",""), "sub_type": item2["type"], "icon": raiplay.getThumbnailUrl2(item2)}, liStyle)
+        
     xbmcplugin.endOfDirectory(handle=handle, succeeded=True)
     
 def show_tgr_root():
@@ -432,7 +430,7 @@ def show_replay_tv_channels(date):
     raiplay = RaiPlay(Addon)
     for station in tv_stations:
         liStyle = xbmcgui.ListItem(station["channel"])
-        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station.get("transparent-icon",""))})
+        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
         addDirectoryItem({"mode": "replay",
             "media": "tv",
             "channel_id": station["channel"],
@@ -843,7 +841,7 @@ def get_raisport_items(params):
     for i in range(0, len(sub_keys)):
         key = sub_keys[i]
         title = key.get("title","")
-        title = utils.checkStr(HTMLParser.HTMLParser().unescape(title))
+        title = utils.checkStr(HTMLParser.unescape(title))
         
         liStyle = xbmcgui.ListItem(title)
         addDirectoryItem({"mode": "raisport_subitem", "dominio" : key["dominio"] , "key": key["key"]}, liStyle)

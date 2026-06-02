@@ -1,3 +1,6 @@
+[B]4.6.0[/B]
+- new news section (from raiplay home page)
+
 [B]4.5.2[/B]
 - new url for channels list  
 

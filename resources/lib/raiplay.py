@@ -69,7 +69,16 @@ class RaiPlay:
     def getHomePage(self, defaultUrl):
         response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + defaultUrl).read()))
         return response["contents"]
-      
+
+    def getNewsCollection(self, defaultUrl="index.json"):
+        response = json.loads(utils.checkStr(urllib2.urlopen(self.baseUrl + defaultUrl).read()))
+        
+        for item in response["contents"]:
+            if item.get("name","") =="L'informazione Rai":
+                #trovata la collezione dei tg
+                return item["contents"]
+        
+        
     def getRaiSportLivePage(self):
         chList = []
 
