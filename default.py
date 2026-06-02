@@ -430,7 +430,7 @@ def show_replay_tv_channels(date):
     raiplay = RaiPlay(Addon)
     for station in tv_stations:
         liStyle = xbmcgui.ListItem(station["channel"])
-        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station["transparent-icon"])})
+        liStyle.setArt({"thumb": raiplay.getThumbnailUrl(station.get("transparent-icon",""))})
         addDirectoryItem({"mode": "replay",
             "media": "tv",
             "channel_id": station["channel"],
